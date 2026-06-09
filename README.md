@@ -1,128 +1,236 @@
-import { Page, Locator, expect } from '@playwright/test';
+Cart
+import { test, expect } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+import { ProductsPage } from '../pages/ProductsPage';
+import { CartPage } from '../pages/CartPage';
 
-export class LoginPage {
+test('TC_007 Remove product from cart @cart', async ({ page }) => {
 
-    readonly page: Page;
-    readonly usernameInput: Locator;
-    readonly passwordInput: Locator;
-    readonly loginButton: Locator;
-    readonly errorMessage: Locator;
+    const loginPage = new LoginPage(page);
+    const productsPage = new ProductsPage(page);
 
-    constructor(page: Page) {
-        this.page = page;
+    await loginPage.goto();
 
-        this.usernameInput = page.locator('#user-name');
-        this.passwordInput = page.locator('#password');
-        this.loginButton = page.locator('#login-button');
-        this.errorMessage = page.locator('[data-test="error"]');
-    }
+    await loginPage.login(
+        'standard_user',
+        'secret_sauce'
+    );
 
-    async goto() {
-        await this.page.goto('https://www.saucedemo.com/');
-    }
+    await productsPage.addBackpack();
 
-    async login(username: string, password: string) {
-        await this.usernameInput.fill(username);
-        await this.passwordInput.fill(password);
-        await this.loginButton.click();
-    }
+    await productsPage.removeBackpack();
 
-    async verifyErrorMessage(message: string) {
-        await expect(this.errorMessage)
-            .toContainText(message);
-    }
+    await expect(
+        page.locator('.shopping_cart_badge')
+    ).toHaveCount(0);
+
+});
+
+test('TC_013 Continue Shopping @cart', async ({ page }) => {
+
+    const loginPage = new LoginPage(page);
+    const productsPage = new ProductsPage(page);
+    const cartPage = new CartPage(page);
+
+    await loginPage.goto();
+
+    await loginPage.login(
+        'standard_user',
+        'secret_sauce'
+    );
+
+    await productsPage.addBackpack();
+
+    await productsPage.goToCart();
+
+    await cartPage.continueShopping();
+
+    await expect(page)
+        .toHaveURL(/inventory.html/);
+
+});
+
+
+Checkout 
+import { test, expect } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+import { ProductsPage } from '../pages/ProductsPage';
+import { CartPage } from '../pages/CartPage';
+import { CheckoutPage } from '../pages/CheckoutPage';
+
+async function loginAndReachCheckout(page: any) {
+
+    const loginPage = new LoginPage(page);
+    const productsPage = new ProductsPage(page);
+    const cartPage = new CartPage(page);
+
+    await loginPage.goto();
+
+    await loginPage.login(
+        'standard_user',
+        'secret_sauce'
+    );
+
+    await productsPage.addBackpack();
+
+    await productsPage.goToCart();
+
+    await cartPage.checkout();
 }
 
+// TC_010
+test('TC_010 Valid checkout @checkout', async ({ page }) => {
+
+    const checkoutPage = new CheckoutPage(page);
+
+    await loginAndReachCheckout(page);
+
+    await checkoutPage.fillDetails(
+        'Sayee',
+        'Kokate',
+        '400001'
+    );
+
+    await checkoutPage.continueCheckout();
+
+    await expect(page)
+        .toHaveURL(/checkout-step-two/);
+
+});
+
+// TC_011
+test('TC_011 Checkout with missing first name @negative', async ({ page }) => {
+
+    const checkoutPage = new CheckoutPage(page);
+
+    await loginAndReachCheckout(page);
+
+    await checkoutPage.fillDetails(
+        '',
+        'Kokate',
+        '400001'
+    );
+
+    await checkoutPage.continueCheckout();
+
+    await checkoutPage.verifyValidationMessage(
+        'First Name is required'
+    );
+
+});
+
+// TC_012
+test('TC_012 Checkout with missing postal code @negative', async ({ page }) => {
+
+    const checkoutPage = new CheckoutPage(page);
+
+    await loginAndReachCheckout(page);
+
+    await checkoutPage.fillDetails(
+        'Sayee',
+        'Kokate',
+        ''
+    );
+
+    await checkoutPage.continueCheckout();
+
+    await checkoutPage.verifyValidationMessage(
+        'Postal Code is required'
+    );
+
+});
 
 
 
-import { Page, expect } from '@playwright/test';
-
-export class ProductsPage {
-
-    constructor(private page: Page) {}
-
-    async addBackpack() {
-        await this.page
-            .locator('#add-to-cart-sauce-labs-backpack')
-            .click();
-    }
-
-    async removeBackpack() {
-        await this.page
-            .locator('#remove-sauce-labs-backpack')
-            .click();
-    }
-
-    async verifyCartCount(count: string) {
-        await expect(
-            this.page.locator('.shopping_cart_badge')
-        ).toHaveText(count);
-    }
-
-    async goToCart() {
-        await this.page.locator('.shopping_cart_link').click();
-    }
-}
-
-
-
-
-import { Page, expect } from '@playwright/test';
-
-export class CartPage {
-
-    constructor(private page: Page) {}
-
-    async verifyProduct(product: string) {
-        await expect(
-            this.page.getByText(product)
-        ).toBeVisible();
-    }
-
-    async checkout() {
-        await this.page.locator('#checkout').click();
-    }
-}
-
-
-
-
-import { Page, expect } from '@playwright/test';
-
-export class CheckoutPage {
-
-    constructor(private page: Page) {}
-
-    async fillDetails(
-        firstName: string,
-        lastName: string,
-        postalCode: string
-    ) {
-
-        await this.page.fill('#first-name', firstName);
-        await this.page.fill('#last-name', lastName);
-        await this.page.fill('#postal-code', postalCode);
-    }
-
-    async continueCheckout() {
-        await this.page.locator('#continue').click();
-    }
-
-    async verifyValidationMessage(message: string) {
-        await expect(
-            this.page.locator('[data-test="error"]')
-        ).toContainText(message);
-    }
-}
-
-
-
-
-import { Page } from '@playwright/test';
+Login
+import { test, expect } from '@playwright/test';
+import { users } from '../test-cases/users';
 import { LoginPage } from '../pages/LoginPage';
 
-export async function loginAsStandardUser(page: Page) {
+// TC_001
+test('TC_001 Login page should load @smoke', async ({ page }) => {
+
+    const loginPage = new LoginPage(page);
+
+    await loginPage.goto();
+
+    await expect(page).toHaveTitle(/Swag Labs/);
+
+});
+
+// TC_002
+test('TC_002 Valid user should login @smoke', async ({ page }) => {
+
+    const standardUser = users.find(
+        user => user.type === 'standard'
+    );
+
+    const loginPage = new LoginPage(page);
+
+    await loginPage.goto();
+
+    await loginPage.login(
+        standardUser!.username,
+        standardUser!.password
+    );
+
+    await expect(page).toHaveURL(/inventory/);
+
+});
+
+// TC_003
+test('TC_003 Invalid password should show error @negative', async ({ page }) => {
+
+    const standardUser = users.find(
+        user => user.type === 'standard'
+    );
+
+    const loginPage = new LoginPage(page);
+
+    await loginPage.goto();
+
+    await loginPage.login(
+        standardUser!.username,
+        'wrongpassword'
+    );
+
+    await loginPage.verifyErrorMessage(
+        'Username and password do not match'
+    );
+
+});
+
+// TC_004
+test('TC_004 Locked user should not login @negative', async ({ page }) => {
+
+    const lockedUser = users.find(
+        user => user.type === 'locked'
+    );
+
+    const loginPage = new LoginPage(page);
+
+    await loginPage.goto();
+
+    await loginPage.login(
+        lockedUser!.username,
+        lockedUser!.password
+    );
+
+    await loginPage.verifyErrorMessage(
+        'locked out'
+    );
+
+});
+
+
+
+
+Product 
+import { test, expect } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+import { ProductsPage } from '../pages/ProductPage';
+
+test('TC_005 Product list visible @regression', async ({ page }) => {
 
     const loginPage = new LoginPage(page);
 
@@ -132,4 +240,71 @@ export async function loginAsStandardUser(page: Page) {
         'standard_user',
         'secret_sauce'
     );
-}
+
+    await expect(
+        page.locator('.inventory_item')
+    ).toHaveCount(6);
+
+});
+
+test('TC_006 Add product to cart @cart', async ({ page }) => {
+
+    const loginPage = new LoginPage(page);
+    const productsPage = new ProductsPage(page);
+
+    await loginPage.goto();
+
+    await loginPage.login(
+        'standard_user',
+        'secret_sauce'
+    );
+
+    await productsPage.addBackpack();
+
+    await productsPage.verifyCartCount('1');
+
+});
+
+test('TC_008 Add multiple products @cart', async ({ page }) => {
+
+    const loginPage = new LoginPage(page);
+    const productsPage = new ProductsPage(page);
+
+    await loginPage.goto();
+
+    await loginPage.login(
+        'standard_user',
+        'secret_sauce'
+    );
+
+    await productsPage.addBackpack();
+
+    await page
+        .locator('#add-to-cart-sauce-labs-bike-light')
+        .click();
+
+    await productsPage.verifyCartCount('2');
+
+});
+
+test('TC_009 Verify products in cart @cart', async ({ page }) => {
+
+    const loginPage = new LoginPage(page);
+    const productsPage = new ProductsPage(page);
+
+    await loginPage.goto();
+
+    await loginPage.login(
+        'standard_user',
+        'secret_sauce'
+    );
+
+    await productsPage.addBackpack();
+
+    await productsPage.goToCart();
+
+    await expect(
+        page.getByText('Sauce Labs Backpack')
+    ).toBeVisible();
+
+});
