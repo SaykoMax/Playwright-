@@ -1,126 +1,135 @@
-test('TC_006 Add product to cart', async ({ page }) => {
+import { Page, Locator, expect } from '@playwright/test';
 
-    await page.goto('https://www.saucedemo.com/');
+export class LoginPage {
 
-    await page.locator('#user-name').fill('standard_user');
-    await page.locator('#password').fill('secret_sauce');
-    await page.locator('#login-button').click();
+    readonly page: Page;
+    readonly usernameInput: Locator;
+    readonly passwordInput: Locator;
+    readonly loginButton: Locator;
+    readonly errorMessage: Locator;
 
-    await page.locator('#add-to-cart-sauce-labs-backpack').click();
+    constructor(page: Page) {
+        this.page = page;
 
-    await expect(page.locator('.shopping_cart_badge'))
-        .toHaveText('1');
-});
-test('TC_007 Remove product from cart', async ({ page }) => {
+        this.usernameInput = page.locator('#user-name');
+        this.passwordInput = page.locator('#password');
+        this.loginButton = page.locator('#login-button');
+        this.errorMessage = page.locator('[data-test="error"]');
+    }
 
-    await page.goto('https://www.saucedemo.com/');
+    async goto() {
+        await this.page.goto('https://www.saucedemo.com/');
+    }
 
-    await page.locator('#user-name').fill('standard_user');
-    await page.locator('#password').fill('secret_sauce');
-    await page.locator('#login-button').click();
+    async login(username: string, password: string) {
+        await this.usernameInput.fill(username);
+        await this.passwordInput.fill(password);
+        await this.loginButton.click();
+    }
 
-    await page.locator('#add-to-cart-sauce-labs-backpack').click();
-
-    await page.locator('#remove-sauce-labs-backpack').click();
-
-    await expect(
-        page.locator('.shopping_cart_badge')
-    ).toHaveCount(0);
-});
-test('TC_008 Add multiple products', async ({ page }) => {
-
-    await page.goto('https://www.saucedemo.com/');
-
-    await page.locator('#user-name').fill('standard_user');
-    await page.locator('#password').fill('secret_sauce');
-    await page.locator('#login-button').click();
-
-    await page.locator('#add-to-cart-sauce-labs-backpack').click();
-
-    await page.locator('#add-to-cart-sauce-labs-bike-light').click();
-
-    await expect(page.locator('.shopping_cart_badge'))
-        .toHaveText('2');
-});
-test('TC_009 Verify products in cart', async ({ page }) => {
-
-    await page.goto('https://www.saucedemo.com/');
-
-    await page.locator('#user-name').fill('standard_user');
-    await page.locator('#password').fill('secret_sauce');
-    await page.locator('#login-button').click();
-
-    await page.locator('#add-to-cart-sauce-labs-backpack').click();
-
-    await page.locator('.shopping_cart_link').click();
-
-    await expect(
-        page.getByText('Sauce Labs Backpack')
-    ).toBeVisible();
-});
-
-
-
-
-
-import { test, expect } from '@playwright/test';
-
-const USERNAME = 'standard_user';
-const PASSWORD = 'secret_sauce';
-
-async function loginAndAddProduct(page: any) {
-
-    await page.goto('https://www.saucedemo.com/');
-
-    await page.locator('#user-name').fill(USERNAME);
-    await page.locator('#password').fill(PASSWORD);
-    await page.locator('#login-button').click();
-
-    await page.locator('#add-to-cart-sauce-labs-backpack').click();
-
-    await page.locator('.shopping_cart_link').click();
-
-    await page.locator('#checkout').click();
+    async verifyErrorMessage(message: string) {
+        await expect(this.errorMessage)
+            .toContainText(message);
+    }
 }
 
-// TC_010
-test('TC_010 Valid checkout', async ({ page }) => {
 
-    await loginAndAddProduct(page);
 
-    await page.locator('#first-name').fill('Sayee');
-    await page.locator('#last-name').fill('Kokate');
-    await page.locator('#postal-code').fill('400001');
 
-    await page.locator('#continue').click();
+import { Page, expect } from '@playwright/test';
 
-    await expect(page).toHaveURL(/checkout-step-two/);
-});
+export class ProductsPage {
 
-// TC_011
-test('TC_011 Checkout with missing first name', async ({ page }) => {
+    constructor(private page: Page) {}
 
-    await loginAndAddProduct(page);
+    async addBackpack() {
+        await this.page
+            .locator('#add-to-cart-sauce-labs-backpack')
+            .click();
+    }
 
-    await page.locator('#last-name').fill('Kokate');
-    await page.locator('#postal-code').fill('400001');
+    async removeBackpack() {
+        await this.page
+            .locator('#remove-sauce-labs-backpack')
+            .click();
+    }
 
-    await page.locator('#continue').click();
+    async verifyCartCount(count: string) {
+        await expect(
+            this.page.locator('.shopping_cart_badge')
+        ).toHaveText(count);
+    }
 
-    await expect(page.locator('[data-test="error"]'))
-        .toContainText('First Name is required');
-});
+    async goToCart() {
+        await this.page.locator('.shopping_cart_link').click();
+    }
+}
 
-// TC_012
-test('TC_012 Checkout with missing postal code', async ({ page }) => {
 
-    await loginAndAddProduct(page);
 
-    await page.locator('#first-name').fill('Sayee');
-    await page.locator('#last-name').fill('Kokate');
 
-    await page.locator('#continue').click();
+import { Page, expect } from '@playwright/test';
 
-    await expect(page.locator('[data-test="error"]'))
-        .toContainText('Postal Code is required');
-});
+export class CartPage {
+
+    constructor(private page: Page) {}
+
+    async verifyProduct(product: string) {
+        await expect(
+            this.page.getByText(product)
+        ).toBeVisible();
+    }
+
+    async checkout() {
+        await this.page.locator('#checkout').click();
+    }
+}
+
+
+
+
+import { Page, expect } from '@playwright/test';
+
+export class CheckoutPage {
+
+    constructor(private page: Page) {}
+
+    async fillDetails(
+        firstName: string,
+        lastName: string,
+        postalCode: string
+    ) {
+
+        await this.page.fill('#first-name', firstName);
+        await this.page.fill('#last-name', lastName);
+        await this.page.fill('#postal-code', postalCode);
+    }
+
+    async continueCheckout() {
+        await this.page.locator('#continue').click();
+    }
+
+    async verifyValidationMessage(message: string) {
+        await expect(
+            this.page.locator('[data-test="error"]')
+        ).toContainText(message);
+    }
+}
+
+
+
+
+import { Page } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+
+export async function loginAsStandardUser(page: Page) {
+
+    const loginPage = new LoginPage(page);
+
+    await loginPage.goto();
+
+    await loginPage.login(
+        'standard_user',
+        'secret_sauce'
+    );
+}
