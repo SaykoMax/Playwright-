@@ -1,42 +1,379 @@
-TC ID	Module	Detailed Test Scenario	Type	Priority	Test Steps	Expected Result
+TC_012 – Verify that the shopping cart badge count accurately reflects the number of selected products.
 
-TC_001	Login	Verify that the SauceDemo login page loads successfully and displays Username field, Password field, Login button, and application logo.	Smoke	High	1. Open browser 2. Navigate to SauceDemo URL	Login page should load with all required controls visible
-TC_002	Login	Verify that a user can successfully log in using valid credentials (standard_user / secret_sauce).	Smoke	High	1. Open SauceDemo 2. Enter valid username 3. Enter valid password 4. Click Login	User should be redirected to the Products page
-TC_003	Login	Verify that an error message is displayed when an invalid username and invalid password are entered.	Negative	High	1. Enter invalid username 2. Enter invalid password 3. Click Login	Appropriate error message should be displayed
-TC_004	Login	Verify that an error message is displayed when a valid username and incorrect password are entered.	Negative	High	1. Enter valid username 2. Enter invalid password 3. Click Login	Error message should be displayed
-TC_005	Login	Verify that an error message is displayed when an invalid username and valid password are entered.	Negative	High	1. Enter invalid username 2. Enter valid password 3. Click Login	Error message should be displayed
-TC_006	Login	Verify that a locked-out user cannot log in and receives the appropriate locked-out error message.	Negative	High	1. Enter locked user credentials 2. Click Login	Locked user error should be displayed
-TC_007	Products	Verify that all available products are displayed after successful login.	Smoke	High	1. Login successfully 2. Observe product listing page	All products should be displayed
-TC_008	Products	Verify that product name, description, price, and Add to Cart button are visible for every product displayed on the Products page.	Regression	Medium	1. Login 2. View products page	Product details should be visible
-TC_009	Cart	Verify that a selected product can be added to the shopping cart successfully.	Regression	High	1. Login 2. Click Add to Cart on a product	Product should be added to cart
-TC_010	Cart	Verify that the shopping cart badge count increases after adding a product to the cart.	Regression	High	1. Add one product to cart	Cart badge count should become 1
-TC_011	Cart	Verify that multiple products can be added to the shopping cart successfully.	Regression	Medium	1. Add multiple products	All selected products should be added
-TC_012	Cart	Verify that the shopping cart badge count accurately reflects the number of selected products.	Regression	Medium	1. Add multiple products	Badge count should match selected items
-TC_013	Cart	Verify that a product can be removed successfully from the shopping cart from the Products page.	Regression	Medium	1. Add product 2. Click Remove	Product should be removed
-TC_014	Cart	Verify that the shopping cart badge disappears when all products are removed from the cart.	Regression	Medium	1. Add product 2. Remove product	Cart badge should disappear
-TC_015	Cart	Verify that clicking the cart icon navigates the user to the Cart page.	Smoke	High	1. Login 2. Click cart icon	Cart page should open
-TC_016	Cart	Verify that all selected products are displayed correctly on the Cart page.	Regression	High	1. Add product 2. Open cart	Added products should be displayed
-TC_017	Cart	Verify that a product can be removed from the Cart page.	Regression	Medium	1. Open cart 2. Remove product	Product should be removed
-TC_018	Cart	Verify that clicking Continue Shopping redirects the user back to the Products page.	Regression	Low	1. Open cart 2. Click Continue Shopping	User should return to Products page
-TC_019	Checkout	Verify that clicking the Checkout button redirects the user to the Checkout Information page.	Smoke	High	1. Open cart 2. Click Checkout	Checkout Information page should open
-TC_020	Checkout	Verify that checkout is successful when valid First Name, Last Name, and Postal Code are entered.	Smoke	High	1. Enter valid checkout details 2. Click Continue	User should reach Checkout Overview page
-TC_021	Checkout	Verify that an error message is displayed when the First Name field is left empty during checkout.	Negative	High	1. Leave First Name blank 2. Continue checkout	Validation message should appear
-TC_022	Checkout	Verify that an error message is displayed when the Last Name field is left empty during checkout.	Negative	High	1. Leave Last Name blank 2. Continue checkout	Validation message should appear
-TC_023	Checkout	Verify that an error message is displayed when the Postal Code field is left empty during checkout.	Negative	High	1. Leave Postal Code blank 2. Continue checkout	Validation message should appear
-TC_024	Checkout	Verify that checkout information is accepted when special characters are entered in the First Name field.	Negative	Medium	1. Enter special characters in First Name 2. Continue	System behavior should be validated
-TC_025	Checkout	Verify that checkout information is accepted when numeric values are entered in the First Name field.	Negative	Medium	1. Enter numeric values in First Name 2. Continue	System behavior should be validated
-TC_026	Checkout	Verify that Postal Code accepts fewer than 6 digits.	Negative	Medium	1. Enter short Postal Code 2. Continue	System behavior should be validated
-TC_027	Checkout	Verify that Postal Code accepts more than 6 digits.	Negative	Medium	1. Enter long Postal Code 2. Continue	System behavior should be validated
-TC_028	Checkout	Verify that Postal Code accepts alphanumeric values.	Negative	Medium	1. Enter alphanumeric Postal Code 2. Continue	System behavior should be validated
-TC_029	Checkout	Verify that the Checkout Overview page displays all selected products correctly before order placement.	Regression	High	1. Proceed to overview page	Selected products should be displayed
-TC_030	Checkout	Verify that item total, tax amount, and final total amount are calculated and displayed correctly.	Regression	High	1. Proceed to overview page	Totals should be calculated correctly
-TC_031	Checkout	Verify that clicking the Cancel button during checkout redirects the user back to the Cart page.	Regression	Medium	1. Open checkout page 2. Click Cancel	User should return to Cart page
-TC_032	Order Confirmation	Verify that clicking the Finish button successfully places the order.	Smoke	High	1. Complete checkout 2. Click Finish	Order should be placed successfully
-TC_033	Order Confirmation	Verify that the order confirmation message "Thank you for your order!" is displayed after successful checkout.	Smoke	High	1. Complete order	Confirmation message should appear
-TC_034	Order Confirmation	Verify that clicking the Back Home button redirects the user to the Products page.	Regression	Low	1. Complete order 2. Click Back Home	Products page should open
-TC_035	Product Sorting	Verify that products can be sorted alphabetically by Name (A to Z).	Regression	Medium	1. Select Name (A-Z) sorting	Products should appear in ascending order
-TC_036	Product Sorting	Verify that products can be sorted alphabetically by Name (Z to A).	Regression	Medium	1. Select Name (Z-A) sorting	Products should appear in descending order
-TC_037	Product Sorting	Verify that products can be sorted by Price (Low to High).	Regression	Medium	1. Select Low to High sorting	Products should be sorted by lowest price first
-TC_038	Product Sorting	Verify that products can be sorted by Price (High to Low).	Regression	Medium	1. Select High to Low sorting	Products should be sorted by highest price first
-TC_039	Navigation/Menu	Verify that the side navigation menu opens successfully when the menu icon is clicked.	Regression	Low	1. Click menu icon	Side menu should open
-TC_040	Navigation/Menu	Verify that the user can successfully log out using the Logout option from the side navigation menu.	Smoke	High	1. Open menu 2. Click Logout	User should return to login page
+Steps:
+
+1. Login to the application.
+2. Add multiple products to the cart.
+3. Observe the cart badge count.
+
+Expected Result:
+The cart badge count should match the total number of selected products.
+
+---
+
+TC_013 – Verify that a product can be removed successfully from the shopping cart from the Products page.
+
+Steps:
+
+1. Login to the application.
+2. Add a product to the cart.
+3. Click the Remove button for the selected product.
+
+Expected Result:
+The selected product should be removed from the cart.
+
+---
+
+TC_014 – Verify that the shopping cart badge disappears when all products are removed from the cart.
+
+Steps:
+
+1. Login to the application.
+2. Add a product to the cart.
+3. Remove the product from the cart.
+
+Expected Result:
+The shopping cart badge should disappear.
+
+---
+
+TC_015 – Verify that clicking the cart icon navigates the user to the Cart page.
+
+Steps:
+
+1. Login to the application.
+2. Click the cart icon.
+
+Expected Result:
+The Cart page should open successfully.
+
+---
+
+TC_016 – Verify that all selected products are displayed correctly on the Cart page.
+
+Steps:
+
+1. Login to the application.
+2. Add one or more products to the cart.
+3. Open the Cart page.
+
+Expected Result:
+All selected products should be displayed on the Cart page.
+
+---
+
+TC_017 – Verify that a product can be removed from the Cart page.
+
+Steps:
+
+1. Login to the application.
+2. Add a product to the cart.
+3. Open the Cart page.
+4. Click the Remove button.
+
+Expected Result:
+The selected product should be removed from the cart.
+
+---
+
+TC_018 – Verify that clicking Continue Shopping redirects the user back to the Products page.
+
+Steps:
+
+1. Login to the application.
+2. Open the Cart page.
+3. Click Continue Shopping.
+
+Expected Result:
+The user should be redirected to the Products page.
+
+---
+
+TC_019 – Verify that clicking the Checkout button redirects the user to the Checkout Information page.
+
+Steps:
+
+1. Login to the application.
+2. Add a product to the cart.
+3. Open the Cart page.
+4. Click Checkout.
+
+Expected Result:
+The Checkout Information page should open.
+
+---
+
+TC_020 – Verify that checkout is successful when valid First Name, Last Name, and Postal Code are entered.
+
+Steps:
+
+1. Proceed to the Checkout Information page.
+2. Enter valid First Name.
+3. Enter valid Last Name.
+4. Enter valid Postal Code.
+5. Click Continue.
+
+Expected Result:
+The user should navigate to the Checkout Overview page.
+
+---
+
+TC_021 – Verify that an error message is displayed when the First Name field is left empty during checkout.
+
+Steps:
+
+1. Proceed to the Checkout Information page.
+2. Leave the First Name field blank.
+3. Enter Last Name and Postal Code.
+4. Click Continue.
+
+Expected Result:
+A validation message indicating that First Name is required should be displayed.
+
+---
+
+TC_022 – Verify that an error message is displayed when the Last Name field is left empty during checkout.
+
+Steps:
+
+1. Proceed to the Checkout Information page.
+2. Enter First Name.
+3. Leave Last Name blank.
+4. Enter Postal Code.
+5. Click Continue.
+
+Expected Result:
+A validation message indicating that Last Name is required should be displayed.
+
+---
+
+TC_023 – Verify that an error message is displayed when the Postal Code field is left empty during checkout.
+
+Steps:
+
+1. Proceed to the Checkout Information page.
+2. Enter First Name.
+3. Enter Last Name.
+4. Leave Postal Code blank.
+5. Click Continue.
+
+Expected Result:
+A validation message indicating that Postal Code is required should be displayed.
+
+---
+
+TC_024 – Verify system behavior when special characters are entered in the First Name field during checkout.
+
+Steps:
+
+1. Proceed to the Checkout Information page.
+2. Enter special characters in the First Name field.
+3. Enter valid Last Name and Postal Code.
+4. Click Continue.
+
+Expected Result:
+The application should handle the input according to business rules without crashing.
+
+---
+
+TC_025 – Verify system behavior when numeric values are entered in the First Name field during checkout.
+
+Steps:
+
+1. Proceed to the Checkout Information page.
+2. Enter numeric values in the First Name field.
+3. Enter valid Last Name and Postal Code.
+4. Click Continue.
+
+Expected Result:
+The application should handle the input according to business rules.
+
+---
+
+TC_026 – Verify system behavior when Postal Code contains fewer than 6 digits.
+
+Steps:
+
+1. Proceed to the Checkout Information page.
+2. Enter valid First Name and Last Name.
+3. Enter a short Postal Code.
+4. Click Continue.
+
+Expected Result:
+The application should process the input according to validation rules.
+
+---
+
+TC_027 – Verify system behavior when Postal Code contains more than 6 digits.
+
+Steps:
+
+1. Proceed to the Checkout Information page.
+2. Enter valid First Name and Last Name.
+3. Enter a long Postal Code.
+4. Click Continue.
+
+Expected Result:
+The application should process the input according to validation rules.
+
+---
+
+TC_028 – Verify system behavior when alphanumeric values are entered in the Postal Code field.
+
+Steps:
+
+1. Proceed to the Checkout Information page.
+2. Enter valid First Name and Last Name.
+3. Enter an alphanumeric Postal Code.
+4. Click Continue.
+
+Expected Result:
+The application should process the input according to validation rules.
+
+---
+
+TC_029 – Verify that the Checkout Overview page displays all selected products correctly before order placement.
+
+Steps:
+
+1. Add products to the cart.
+2. Complete Checkout Information.
+3. Proceed to the Checkout Overview page.
+
+Expected Result:
+All selected products should be displayed correctly.
+
+---
+
+TC_030 – Verify that item total, tax amount, and final total amount are calculated and displayed correctly.
+
+Steps:
+
+1. Add products to the cart.
+2. Proceed to Checkout Overview.
+3. Review price details.
+
+Expected Result:
+Item total, tax amount, and final total should be calculated accurately.
+
+---
+
+TC_031 – Verify that clicking the Cancel button during checkout redirects the user back to the Cart page.
+
+Steps:
+
+1. Open the Checkout Information page.
+2. Click Cancel.
+
+Expected Result:
+The user should be redirected to the Cart page.
+
+---
+
+TC_032 – Verify that clicking the Finish button successfully places the order.
+
+Steps:
+
+1. Complete checkout information.
+2. Proceed to Checkout Overview.
+3. Click Finish.
+
+Expected Result:
+The order should be placed successfully.
+
+---
+
+TC_033 – Verify that the order confirmation message "Thank you for your order!" is displayed after successful checkout.
+
+Steps:
+
+1. Complete the order process.
+2. Observe the confirmation page.
+
+Expected Result:
+The message "Thank you for your order!" should be displayed.
+
+---
+
+TC_034 – Verify that clicking the Back Home button redirects the user to the Products page.
+
+Steps:
+
+1. Complete an order.
+2. Click Back Home.
+
+Expected Result:
+The user should be redirected to the Products page.
+
+---
+
+TC_035 – Verify that products can be sorted alphabetically by Name (A to Z).
+
+Steps:
+
+1. Login to the application.
+2. Select the Name (A to Z) sorting option.
+
+Expected Result:
+Products should be displayed in ascending alphabetical order.
+
+---
+
+TC_036 – Verify that products can be sorted alphabetically by Name (Z to A).
+
+Steps:
+
+1. Login to the application.
+2. Select the Name (Z to A) sorting option.
+
+Expected Result:
+Products should be displayed in descending alphabetical order.
+
+---
+
+TC_037 – Verify that products can be sorted by Price (Low to High).
+
+Steps:
+
+1. Login to the application.
+2. Select the Price (Low to High) sorting option.
+
+Expected Result:
+Products should be displayed from the lowest price to the highest price.
+
+---
+
+TC_038 – Verify that products can be sorted by Price (High to Low).
+
+Steps:
+
+1. Login to the application.
+2. Select the Price (High to Low) sorting option.
+
+Expected Result:
+Products should be displayed from the highest price to the lowest price.
+
+---
+
+TC_039 – Verify that the side navigation menu opens successfully when the menu icon is clicked.
+
+Steps:
+
+1. Login to the application.
+2. Click the menu icon.
+
+Expected Result:
+The side navigation menu should open successfully.
+
+---
+
+TC_040 – Verify that the user can successfully log out using the Logout option from the side navigation menu.
+
+Steps:
+
+1. Login to the application.
+2. Open the side navigation menu.
+3. Click Logout.
+
+Expected Result:
+The user should be redirected to the Login page.
