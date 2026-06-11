@@ -1,37 +1,151 @@
-Setup and Execution Steps
+import { test, expect } from '@playwright/test';
 
-1. Clone or download the project from GitHub.
+// TC_005 Mock Books API Response
+test('TC_005 Mock Books API', async ({ page }) => {
 
-2. Open the project in Visual Studio Code.
+    await page.route('**/BookStore/v1/Books', async route => {
 
-3. Install project dependencies using:
-   
-   npm install
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                books: [
+                    {
+                        isbn: '111',
+                        title: 'Playwright Mock Book',
+                        subTitle: 'Testing Book',
+                        author: 'QA Team',
+                        publish_date: '2025-01-01',
+                        publisher: 'Playwright',
+                        pages: 100,
+                        description: 'Mocked response',
+                        website: 'https://playwright.dev'
+                    }
+                ]
+            })
+        });
 
-4. Install Playwright browsers using:
-   
-   npx playwright install
+    });
 
-5. Run all test cases using:
-   
-   npx playwright test
+    await page.goto('https://demoqa.com/books');
 
-6. Run tests in headed mode using:
-   
-   npx playwright test --headed
+    await expect(
+        page.getByText('Playwright Mock Book')
+    ).toBeVisible();
 
-7. View the HTML report using:
-   
-   npx playwright show-report
+});
 
-Project Structure
+// TC_006 Mock Empty Books Response
+test('TC_006 Mock Empty Books Response', async ({ page }) => {
 
-- tests → Contains test scripts
-- pages → Contains Page Object Model (POM) files
-- test-data → Contains test data
-- utils → Contains reusable helper methods
+    await page.route('**/BookStore/v1/Books', async route => {
 
-The project is developed using Playwright with TypeScript and follows the Page Object Model (POM) design pattern.
-Self Review Note
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                books: []
+            })
+        });
 
-Through this assignment, I learned Playwright automation with TypeScript and gained hands-on experience in creating automated test cases for Login, Products, Cart, and Checkout modules. I implemented Page Object Model (POM), used TypeScript interfaces and types for test data, and created reusable methods to improve code quality. I also learned about Smoke, Regression, and Negative testing, report generation, and debugging failed test cases. This task helped me improve my automation and QA testing skills.
+    });
+
+    await page.goto('https://demoqa.com/books');
+
+    await expect(page).toHaveURL(/books/);
+
+});
+
+// TC_007 Delay API Response
+test('TC_007 Delay Books API Response', async ({ page }) => {
+
+    await page.route('**/BookStore/v1/Books', async route => {
+
+        await page.waitForTimeout(3000);
+
+        await route.continue();
+
+    });
+
+    await page.goto('https://demoqa.com/books');
+
+    await expect(page).toHaveTitle(/DEMOQA/);
+
+});
+
+
+
+
+import { test, expect } from '@playwright/test';
+
+// TC_001 Verify New Tab button opens a new tab
+test('TC_001 Verify New Tab button opens a new tab', async ({ page }) => {
+
+    await page.goto('https://demoqa.com/browser-windows');
+
+    const [newPage] = await Promise.all([
+        page.context().waitForEvent('page'),
+        page.locator('#tabButton').click()
+    ]);
+
+    await newPage.waitForLoadState();
+
+    await expect(newPage).toHaveURL(/sample/);
+
+});
+
+// TC_002 Verify content of newly opened tab
+test('TC_002 Verify content of newly opened tab', async ({ page }) => {
+
+    await page.goto('https://demoqa.com/browser-windows');
+
+    const [newPage] = await Promise.all([
+        page.context().waitForEvent('page'),
+        page.locator('#tabButton').click()
+    ]);
+
+    await newPage.waitForLoadState();
+
+    await expect(
+        newPage.locator('#sampleHeading')
+    ).toHaveText('This is a sample page');
+
+});
+
+// TC_003 Close child tab and switch back to parent
+test('TC_003 Close child tab and switch back', async ({ page }) => {
+
+    await page.goto('https://demoqa.com/browser-windows');
+
+    const [newPage] = await Promise.all([
+        page.context().waitForEvent('page'),
+        page.locator('#tabButton').click()
+    ]);
+
+    await newPage.close();
+
+    await expect(
+        page.locator('#tabButton')
+    ).toBeVisible();
+
+});
+
+// TC_004 Verify New Window Message
+test('TC_004 Verify New Window Message', async ({ page }) => {
+
+    await page.goto('https://demoqa.com/browser-windows');
+
+    const [newWindow] = await Promise.all([
+        page.context().waitForEvent('page'),
+        page.locator('#messageWindowButton').click()
+    ]);
+
+    await newWindow.waitForLoadState();
+
+    const text = await newWindow
+        .locator('body')
+        .textContent();
+
+    expect(text).toContain('Knowledge');
+
+});
