@@ -1,157 +1,288 @@
-You can add this directly in your Debugging.md or report.
+Playwright Automation Training Task - Day 1 & Day 2
 
-Failure Category	Steps Used to Simulate	Root Cause
+Overview
 
-Locator Failure	1. Open DemoQA page. 2. Use a locator that does not exist such as #wrongLocator. 3. Perform click action.	Locator value was incorrect and Playwright could not find the element on the page.
-Assertion Failure	1. Open DemoQA page. 2. Verify page title with an incorrect expected value using toHaveTitle('Wrong Title').	Actual application value did not match the expected value defined in the test.
-Element Visibility Failure	1. Open DemoQA page. 2. Try to verify visibility of a hidden or non-existent element using toBeVisible().	Element was either hidden, not rendered, or not present in the DOM.
-Navigation Failure	1. Navigate to an invalid URL such as https://invalid-demoqa-url.com. 2. Verify page URL or page content.	Application URL was incorrect or page was unavailable, causing navigation to fail.
-Network Failure	1. Intercept API request using page.route(). 2. Abort the request using route.abort(). 3. Load the page.	Required API request failed, resulting in incomplete or missing application data.
+This project was completed as part of Playwright Automation Training. The objective was to learn advanced Playwright concepts such as Browser Window handling, Network Mocking, Fixtures, Reporting, Debugging, and Timeout handling.
 
-
-Example Write-up for Report
-
-1. Locator Failure
-
-Steps Used to Simulate:
-
-Opened DemoQA website.
-
-Used invalid locator #wrongLocator.
-
-Executed click action.
-
-
-Root Cause: The locator was incorrect and did not match any element present on the page.
-
+The project is implemented using Playwright with TypeScript and follows reusable automation practices.
 
 ---
 
-2. Assertion Failure
+Technology Stack
 
-Steps Used to Simulate:
-
-Opened DemoQA website.
-
-Verified page title using an incorrect expected value.
-
-
-Root Cause: The expected result defined in the test did not match the actual application behavior.
-
+- Playwright
+- TypeScript
+- Node.js
+- Visual Studio Code
 
 ---
 
-3. Element Visibility Failure
+Project Setup
 
-Steps Used to Simulate:
+Install Dependencies
 
-Opened DemoQA website.
+npm install
 
-Tried to verify visibility of a hidden/non-existing element.
+Install Browsers
 
+npx playwright install
 
-Root Cause: The target element was not visible or not available in the DOM at execution time.
+Run All Tests
 
+npx playwright test
 
----
+Run Tests in Headed Mode
 
-4. Navigation Failure
+npx playwright test --headed
 
-Steps Used to Simulate:
+Open HTML Report
 
-Navigated to an invalid URL.
+npx playwright show-report
 
-Attempted page validation.
+Generate Trace
 
+npx playwright test --trace on
 
-Root Cause: The destination URL was unreachable or invalid.
+Open Trace Viewer
 
-
----
-
-5. Network Failure
-
-Steps Used to Simulate:
-
-Intercepted API request.
-
-Aborted network call.
-
-Loaded application page.
-
-
-Root Cause: Backend/API response was unavailable, preventing data from loading correctly.
-
-These explanations are concise and suitable for a QA fresher assignment report.
-
-
-
-
-
-
-You can document the 3 timeout types in the same format as the failure cases.
-
-Timeout Type	Steps Used to Simulate	Root Cause
-
-Test Timeout	1. Set test timeout to 1 second using test.setTimeout(1000). 2. Add a delay longer than 1 second. 3. Execute the test.	The entire test execution exceeded the maximum time configured for the test.
-Expect Timeout	1. Open DemoQA page. 2. Use an invalid locator. 3. Verify visibility using toBeVisible({ timeout: 1000 }).	Playwright waited for the expected condition, but the element never appeared within the specified timeout period.
-Action Timeout	1. Set action timeout to 1 second. 2. Perform an action on an invalid or unavailable element. 3. Execute the test.	The click/fill action could not be completed within the configured timeout duration.
-
-
-Example Write-up for Report
-
-1. Test Timeout
-
-Steps Used to Simulate:
-
-Configured test timeout to 1 second using test.setTimeout(1000).
-
-Added a delay that exceeded 1 second.
-
-Executed the test.
-
-
-Root Cause: The overall test execution took longer than the maximum time allowed for the test, causing Playwright to terminate the test.
-
+npx playwright show-trace trace.zip
 
 ---
 
-2. Expect Timeout
+Project Structure
 
-Steps Used to Simulate:
-
-Opened the application.
-
-Used an invalid locator.
-
-Applied toBeVisible({ timeout: 1000 }).
-
-
-Root Cause: The expected condition was not satisfied within the specified timeout because the target element was not found.
-
+TASK2
+│
+├── tests
+│   ├── browser-window.spec.ts
+│   ├── network-mocking.spec.ts
+│   ├── fixture-demo.spec.ts
+│   ├── failures.spec.ts
+│   └── timeoutSimulation.spec.ts
+│
+├── fixtures
+│   └── baseFixture.ts
+│
+├── utils
+│   └── Logger.ts
+│
+├── docs
+│   └── Debugging.md
+│
+├── playwright.config.ts
+├── package.json
+└── README.md
 
 ---
 
-3. Action Timeout
+Day 1 Tasks
 
-Steps Used to Simulate:
+1. Browser Window Handling
 
-Configured action timeout to 1 second.
+Website Used:
 
-Attempted to click an unavailable element.
+https://demoqa.com/browser-windows
 
-Executed the test.
+Implemented Scenarios:
 
-
-Root Cause: The requested action could not be completed before the configured timeout expired.
+- Verify New Tab button opens a new tab
+- Verify content of newly opened tab
+- Close child tab and switch back to parent tab
+- Verify new message window content
 
 Learning
 
-Test Timeout controls the maximum execution time of an entire test.
+- Handling multiple browser tabs
+- Switching between parent and child windows
+- Using Browser Context events
+- Working with new page events
 
-Expect Timeout controls how long Playwright waits for an assertion to pass.
+---
 
-Action Timeout controls how long Playwright waits for actions such as click, fill, and select before failing.
+2. Network Mocking
 
+Website Used:
 
-This is exactly the level of detail expected in a QA Fresher debugging report.
+https://demoqa.com/books
+
+Implemented Scenarios:
+
+- Mock Books API with custom data
+- Mock empty API response
+- Delay API response and observe behavior
+
+Learning
+
+- API interception using page.route()
+- Returning mocked responses
+- Simulating backend behavior
+- Testing UI without dependency on actual APIs
+
+---
+
+Day 2 Tasks
+
+1. Custom Fixtures
+
+Created:
+
+- Logger utility
+- Base fixture
+
+Files:
+
+- utils/Logger.ts
+- fixtures/baseFixture.ts
+
+Purpose:
+
+To reduce duplicate code and make tests reusable.
+
+Learning
+
+- Fixture lifecycle
+- Shared setup and teardown
+- Dependency injection in Playwright
+
+---
+
+2. Fixture Based Tests
+
+Implemented test cases using custom fixtures.
+
+Learning
+
+- Cleaner test design
+- Better code reusability
+- Easier maintenance
+
+---
+
+Reporting
+
+HTML Report
+
+Generated using:
+
+npx playwright show-report
+
+Information Available:
+
+- Passed tests
+- Failed tests
+- Execution duration
+- Error details
+- Screenshots
+
+---
+
+Trace Viewer
+
+Generated using:
+
+npx playwright test --trace on
+
+Information Available:
+
+- Step-by-step execution
+- Screenshots
+- Network requests
+- Console logs
+- Timeline view
+
+Learning
+
+Trace Viewer is useful for identifying the exact point of failure in a test.
+
+---
+
+Failure Simulation
+
+A separate file was created to understand common automation failures.
+
+Failure Categories Covered
+
+Locator Failure
+
+Root Cause:
+Incorrect locator used in the test.
+
+Assertion Failure
+
+Root Cause:
+Expected result did not match actual result.
+
+Navigation Failure
+
+Root Cause:
+Invalid URL or page unavailable.
+
+Network Failure
+
+Root Cause:
+API request was blocked or aborted.
+
+Timeout Failure
+
+Root Cause:
+Test execution exceeded configured timeout.
+
+---
+
+Timeout Simulation
+
+The following timeout types were implemented and analyzed.
+
+Test Timeout
+
+Occurs when the entire test takes longer than the configured timeout.
+
+Expect Timeout
+
+Occurs when an assertion condition is not met within the specified time.
+
+Action Timeout
+
+Occurs when actions such as click or fill cannot complete within the configured timeout.
+
+---
+
+Debugging Tools Used
+
+- HTML Report
+- Trace Viewer
+- Playwright Inspector
+- Screenshots
+- Console Logs
+
+---
+
+Key Learnings
+
+During this task I learned:
+
+- Playwright project setup
+- Browser tab and window handling
+- Network mocking concepts
+- Custom fixture implementation
+- Generating and analyzing reports
+- Using Trace Viewer
+- Debugging failed tests
+- Understanding different timeout types
+- Writing reusable automation code
+
+---
+
+Challenges Faced
+
+- Understanding Browser Context events
+- Implementing Network Mocking correctly
+- Working with custom fixtures
+- Analyzing failures using Trace Viewer
+- Understanding timeout behavior
+
+---
+
+Conclusion
+
+This assignment helped me gain practical experience with advanced Playwright concepts beyond basic UI automation. I learned how to create reusable test frameworks, debug failures effectively, work with mocked APIs, and analyze executions using reports and traces. These concepts will help in building scalable and maintainable automation frameworks in future projects.
