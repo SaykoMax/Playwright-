@@ -83,3 +83,75 @@ Loaded application page.
 Root Cause: Backend/API response was unavailable, preventing data from loading correctly.
 
 These explanations are concise and suitable for a QA fresher assignment report.
+
+
+
+
+
+
+You can document the 3 timeout types in the same format as the failure cases.
+
+Timeout Type	Steps Used to Simulate	Root Cause
+
+Test Timeout	1. Set test timeout to 1 second using test.setTimeout(1000). 2. Add a delay longer than 1 second. 3. Execute the test.	The entire test execution exceeded the maximum time configured for the test.
+Expect Timeout	1. Open DemoQA page. 2. Use an invalid locator. 3. Verify visibility using toBeVisible({ timeout: 1000 }).	Playwright waited for the expected condition, but the element never appeared within the specified timeout period.
+Action Timeout	1. Set action timeout to 1 second. 2. Perform an action on an invalid or unavailable element. 3. Execute the test.	The click/fill action could not be completed within the configured timeout duration.
+
+
+Example Write-up for Report
+
+1. Test Timeout
+
+Steps Used to Simulate:
+
+Configured test timeout to 1 second using test.setTimeout(1000).
+
+Added a delay that exceeded 1 second.
+
+Executed the test.
+
+
+Root Cause: The overall test execution took longer than the maximum time allowed for the test, causing Playwright to terminate the test.
+
+
+---
+
+2. Expect Timeout
+
+Steps Used to Simulate:
+
+Opened the application.
+
+Used an invalid locator.
+
+Applied toBeVisible({ timeout: 1000 }).
+
+
+Root Cause: The expected condition was not satisfied within the specified timeout because the target element was not found.
+
+
+---
+
+3. Action Timeout
+
+Steps Used to Simulate:
+
+Configured action timeout to 1 second.
+
+Attempted to click an unavailable element.
+
+Executed the test.
+
+
+Root Cause: The requested action could not be completed before the configured timeout expired.
+
+Learning
+
+Test Timeout controls the maximum execution time of an entire test.
+
+Expect Timeout controls how long Playwright waits for an assertion to pass.
+
+Action Timeout controls how long Playwright waits for actions such as click, fill, and select before failing.
+
+
+This is exactly the level of detail expected in a QA Fresher debugging report.
