@@ -1,164 +1,484 @@
-Playwright Automation Training Task - Day 1 & Day 2
+Perfect. Since the repository contains the files we created for the assignment, here's how you can explain the project to your senior file-by-file.
 
-Overview
+Project Overview
 
-This project was completed as part of Playwright Automation Training. The objective was to learn advanced Playwright concepts such as Browser Window handling, Network Mocking, Fixtures, Reporting, Debugging, and Timeout handling.
+This project is divided into two parts:
 
-The project is implemented using Playwright with TypeScript and follows reusable automation practices.
+Day 1
 
----
+Browser Window Handling
 
-Technology Stack
+Network Mocking
 
-- Playwright
-- TypeScript
-- Node.js
-- Visual Studio Code
 
----
+Day 2
 
-Project Setup
+Fixtures
 
-Install Dependencies
+Reports
 
-npm install
+Trace Viewer
 
-Install Browsers
+Debugging
 
-npx playwright install
+Timeout Simulation
 
-Run All Tests
 
-npx playwright test
-
-Run Tests in Headed Mode
-
-npx playwright test --headed
-
-Open HTML Report
-
-npx playwright show-report
-
-Generate Trace
-
-npx playwright test --trace on
-
-Open Trace Viewer
-
-npx playwright show-trace trace.zip
 
 ---
 
-Project Structure
+playwright.config.ts
 
-TASK2
-│
-├── tests
-│   ├── browser-window.spec.ts
-│   ├── network-mocking.spec.ts
-│   ├── fixture-demo.spec.ts
-│   ├── failures.spec.ts
-│   └── timeoutSimulation.spec.ts
-│
-├── fixtures
-│   └── baseFixture.ts
-│
-├── utils
-│   └── Logger.ts
-│
-├── docs
-│   └── Debugging.md
-│
-├── playwright.config.ts
-├── package.json
-└── README.md
+Purpose
+
+This is the central configuration file for Playwright.
+
+What it controls
+
+Browser settings
+
+Trace configuration
+
+Screenshots
+
+Reports
+
+Test directory
+
+
+Example explanation:
+
+> This file defines how Playwright executes tests. I configured trace generation, browser execution settings, and reporting options here.
+
+
+
 
 ---
 
-Day 1 Tasks
+browser-window.spec.ts
 
-1. Browser Window Handling
+Purpose
 
-Website Used:
+Automates multiple tab and window scenarios on DemoQA.
 
-https://demoqa.com/browser-windows
+Test Cases
 
-Implemented Scenarios:
+TC_001 Verify New Tab button opens a new tab
 
-- Verify New Tab button opens a new tab
-- Verify content of newly opened tab
-- Close child tab and switch back to parent tab
-- Verify new message window content
+What happens:
+
+1. Open Browser Windows page.
+
+
+2. Click New Tab button.
+
+
+3. Wait for new page event.
+
+
+4. Verify new tab URL.
+
+
+
+Learning:
+
+page.context().waitForEvent('page')
+
+This waits for a new tab to open.
+
+
+---
+
+TC_002 Verify content of newly opened tab
+
+What happens:
+
+1. Open new tab.
+
+
+2. Capture new tab object.
+
+
+3. Verify text:
+
+
+
+This is a sample page
+
+Learning:
+
+Working with child pages.
+
+
+---
+
+TC_003 Close child tab and switch back
+
+What happens:
+
+1. Open new tab.
+
+
+2. Close child tab.
+
+
+3. Continue working with parent page.
+
+
+
+Learning:
+
+Window management.
+
+
+---
+
+TC_004 Verify New Window Message
+
+What happens:
+
+1. Open message window.
+
+
+2. Capture new page.
+
+
+3. Read body text.
+
+
+4. Verify message.
+
+
+
+Learning:
+
+Handling popup windows.
+
+
+---
+
+network-mocking.spec.ts
+
+Purpose
+
+Learn API interception.
+
+
+---
+
+TC_005 Mock Books API
+
+What happens:
+
+page.route()
+
+intercepts Books API.
+
+Instead of actual response:
+
+{
+  "books": [...]
+}
+
+we return our own data.
+
+Then verify UI shows mocked book.
+
+Learning:
+
+route.fulfill()
+
+returns custom response.
+
+
+---
+
+TC_006 Mock Empty Response
+
+What happens:
+
+Return:
+
+{
+  "books": []
+}
+
+Verify application handles no data.
+
+Learning:
+
+Edge case testing.
+
+
+---
+
+TC_007 Delay API Response
+
+What happens:
+
+Intercept request.
+
+Simulate delayed response.
+
+Verify application still loads correctly.
+
+Learning:
+
+Slow network testing.
+
+
+---
+
+Logger.ts
+
+Purpose
+
+Utility class.
+
+Code:
+
+export class Logger {
+   log(message:string){
+      console.log(message);
+   }
+}
+
+Explanation:
+
+Instead of writing:
+
+console.log()
+
+everywhere,
+
+we created reusable utility.
+
+Learning:
+
+Code reusability.
+
+
+---
+
+baseFixture.ts
+
+Purpose
+
+Create reusable Playwright fixture.
+
+Example:
+
+export const test = base.extend(...)
+
+Explanation:
+
+Fixture automatically provides Logger object to tests.
+
+Instead of:
+
+const logger = new Logger();
+
+inside every test,
+
+fixture injects it automatically.
+
+Learning:
+
+Dependency Injection.
+
+
+---
+
+fixture-demo.spec.ts
+
+Purpose
+
+Demonstrate fixture usage.
+
+Example:
+
+test('Fixture Demo',
+ async({page,logger})=>{
+
+Explanation:
+
+Logger comes from fixture.
+
+No object creation needed.
+
+Learning:
+
+Fixture consumption.
+
+
+---
+
+failures.spec.ts
+
+Purpose
+
+Understand common automation failures.
+
+Contains:
+
+Locator Failure
+
+Wrong locator.
+
+Learning:
+
+Importance of stable locators.
+
+
+---
+
+Assertion Failure
+
+Wrong expected value.
+
+Learning:
+
+Assertion validation.
+
+
+---
+
+Navigation Failure
+
+Invalid URL.
+
+Learning:
+
+URL validation.
+
+
+---
+
+Network Failure
+
+API aborted.
+
+Learning:
+
+Backend dependency failures.
+
+
+---
+
+Timeout Failure
+
+Execution exceeds timeout.
+
+Learning:
+
+Test performance analysis.
+
+
+---
+
+timeoutSimulation.spec.ts
+
+Purpose
+
+Understand Playwright timeout types.
+
+
+---
+
+Test Timeout
+
+Entire test exceeds timeout.
+
+test.setTimeout()
+
+
+---
+
+Expect Timeout
+
+Assertion exceeds timeout.
+
+expect(...).toBeVisible()
+
+
+---
+
+Action Timeout
+
+Click/fill action exceeds timeout.
+
+Learning:
+
+Different timeout levels.
+
+
+---
+
+Debugging.md
+
+Purpose
+
+Document debugging analysis.
+
+Contains:
+
+For each failure:
+
+Failure Type
+
+Steps Used
+
+Root Cause
 
 Learning
 
-- Handling multiple browser tabs
-- Switching between parent and child windows
-- Using Browser Context events
-- Working with new page events
+
+Examples:
+
+Locator Failure
+
+Assertion Failure
+
+Navigation Failure
+
+Network Failure
+
+Timeout Failure
+
+
+Also contains:
+
+Test Timeout
+
+Expect Timeout
+
+Action Timeout
+
+
 
 ---
 
-2. Network Mocking
+README.md
 
-Website Used:
+Purpose
 
-https://demoqa.com/books
+Project documentation.
 
-Implemented Scenarios:
+Contains:
 
-- Mock Books API with custom data
-- Mock empty API response
-- Delay API response and observe behavior
+Setup steps
 
-Learning
+Execution steps
 
-- API interception using page.route()
-- Returning mocked responses
-- Simulating backend behavior
-- Testing UI without dependency on actual APIs
+Project structure
 
----
+Learning summary
 
-Day 2 Tasks
+Challenges faced
 
-1. Custom Fixtures
 
-Created:
-
-- Logger utility
-- Base fixture
-
-Files:
-
-- utils/Logger.ts
-- fixtures/baseFixture.ts
-
-Purpose:
-
-To reduce duplicate code and make tests reusable.
-
-Learning
-
-- Fixture lifecycle
-- Shared setup and teardown
-- Dependency injection in Playwright
 
 ---
-
-2. Fixture Based Tests
-
-Implemented test cases using custom fixtures.
-
-Learning
-
-- Cleaner test design
-- Better code reusability
-- Easier maintenance
-
----
-
-Reporting
 
 HTML Report
 
@@ -166,13 +486,17 @@ Generated using:
 
 npx playwright show-report
 
-Information Available:
+Purpose:
 
-- Passed tests
-- Failed tests
-- Execution duration
-- Error details
-- Screenshots
+View passed tests
+
+View failed tests
+
+Error details
+
+Screenshots
+
+
 
 ---
 
@@ -182,107 +506,26 @@ Generated using:
 
 npx playwright test --trace on
 
-Information Available:
+Purpose:
 
-- Step-by-step execution
-- Screenshots
-- Network requests
-- Console logs
-- Timeline view
+Replay test execution step-by-step.
 
-Learning
+Shows:
 
-Trace Viewer is useful for identifying the exact point of failure in a test.
+Actions
 
----
+Screenshots
 
-Failure Simulation
+Network calls
 
-A separate file was created to understand common automation failures.
+DOM state
 
-Failure Categories Covered
 
-Locator Failure
-
-Root Cause:
-Incorrect locator used in the test.
-
-Assertion Failure
-
-Root Cause:
-Expected result did not match actual result.
-
-Navigation Failure
-
-Root Cause:
-Invalid URL or page unavailable.
-
-Network Failure
-
-Root Cause:
-API request was blocked or aborted.
-
-Timeout Failure
-
-Root Cause:
-Test execution exceeded configured timeout.
 
 ---
 
-Timeout Simulation
+If Senior Asks "What did you learn?"
 
-The following timeout types were implemented and analyzed.
+You can answer:
 
-Test Timeout
-
-Occurs when the entire test takes longer than the configured timeout.
-
-Expect Timeout
-
-Occurs when an assertion condition is not met within the specified time.
-
-Action Timeout
-
-Occurs when actions such as click or fill cannot complete within the configured timeout.
-
----
-
-Debugging Tools Used
-
-- HTML Report
-- Trace Viewer
-- Playwright Inspector
-- Screenshots
-- Console Logs
-
----
-
-Key Learnings
-
-During this task I learned:
-
-- Playwright project setup
-- Browser tab and window handling
-- Network mocking concepts
-- Custom fixture implementation
-- Generating and analyzing reports
-- Using Trace Viewer
-- Debugging failed tests
-- Understanding different timeout types
-- Writing reusable automation code
-
----
-
-Challenges Faced
-
-- Understanding Browser Context events
-- Implementing Network Mocking correctly
-- Working with custom fixtures
-- Analyzing failures using Trace Viewer
-- Understanding timeout behavior
-
----
-
-Conclusion
-
-This assignment helped me gain practical experience with advanced Playwright concepts beyond basic UI automation. I learned how to create reusable test frameworks, debug failures effectively, work with mocked APIs, and analyze executions using reports and traces. These concepts will help in building scalable and maintainable automation frameworks in future projects.
+> In this assignment I learned how to handle multiple browser tabs and windows, perform network mocking using Playwright, create reusable fixtures, generate HTML reports and traces, debug different failure types, and understand different timeout mechanisms. I also learned how to organize automation code in a reusable and maintainable structure.
