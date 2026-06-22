@@ -1,19 +1,20 @@
-const report = require('multiple-cucumber-html-reporter');
+Scenario: Verify error message visibility
+  Given user is on login page
+  When user enters invalid credentials
+  Then error message should be displayed
 
-report.generate({
-  jsonDir: 'reports',
-  reportPath: 'reports/html-report',
-  metadata: {
-    browser: {
-      name: 'chrome',
-      version: 'latest'
-    },
-    device: 'Local Machine',
-    platform: {
-      name: 'windows',
-      version: '11'
-    }
-  }
+Scenario: Successful logout
+  Given user is on login page
+  When user enters valid username and password
+  Then user should be navigated to dashboard
+  When user clicks logout button
+  Then user should be redirected to login page
+
+
+When('user clicks logout button', async () => {
+  await page.click('a[href="/logout"]');
 });
 
-console.log('HTML Report Generated');
+Then('user should be redirected to login page', async () => {
+  await expect(page).toHaveURL(/login/);
+});
