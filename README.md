@@ -1,32 +1,53 @@
-import { Given, When, Then, Before, After } from '@cucumber/cucumber';
-import { chromium, Browser, Page, expect } from '@playwright/test';
+import {
+  Given,
+  When,
+  Then,
+  Before,
+  After,
+  BeforeAll,
+  AfterAll,
+  setDefaultTimeout
+} from '@cucumber/cucumber';
+
+import {
+  chromium,
+  Browser,
+  BrowserContext,
+  Page,
+  expect
+} from '@playwright/test';
+
 import { LoginPage } from '../pages/LoginPage';
 
+setDefaultTimeout(120000);
+
 let browser: Browser;
+let context: BrowserContext;
 let page: Page;
 let loginPage: LoginPage;
 
-Before({ timeout: 20000 }, async () => {
+BeforeAll(async () => {
   browser = await chromium.launch({
-    headless: false
+    headless: true
   });
+});
 
-  page = await browser.newPage();
+AfterAll(async () => {
+  await browser.close();
+});
+
+Before(async () => {
+  context = await browser.newContext();
+  page = await context.newPage();
   loginPage = new LoginPage(page);
 });
 
 After(async () => {
-  await browser.close();
+  await context.close();
 });
 
-Given('user is on login page', async () => {
-  await page.goto(
-    'https://the-internet.herokuapp.com/login',
-    {
-      waitUntil: 'domcontentloaded',
-      timeout: 30000
-    }
-  );
+Given('user is on login page', async function () {
+  await loginPage.navigate();
 });
 
 When('user enters valid username and password', async () => {
@@ -48,25 +69,55 @@ Then('user should be navigated to dashboard', async () => {
 });
 
 Then('error message should be displayed', async () => {
-  const errorLocator = await loginPage.getErrorMessage();
-  await expect(errorLocator).toBeTruthy();
+  const errorLocator = loginPage.getErrorMessage();
+  await expect(errorLocator).toBeVisible();
 });
 
 When(
   'user enters {string} and {string}',
-  async (username, password) => {
+  async (username: string, password: string) => {
     await loginPage.login(username, password);
   }
 );
 
 Then(
   'login result should be {string}',
-  async (result) => {
+  async (result: string) => {
     if (result === 'success') {
       await expect(page).toHaveURL(/secure/);
     } else {
-      const errorLocator = await loginPage.getErrorMessage();
-      await expect(errorLocator).toBeTruthy();
+      const errorLocator = loginPage.getErrorMessage();
+      await expect(errorLocator).toBeVisible();
     }
   }
 );
+
+
+
+import { Page } from '@playwright/test';
+
+export class LoginPage {
+  constructor(private page: Page) {}
+
+  async navigate() {
+    await this.page.goto(
+      'https://the-internet.herokuapp.com/login',
+      {
+        waitUntil: 'networkidle'
+      }
+    );
+  }
+
+  async login(
+    username: string,
+    password: string
+  ) {
+    await this.page.fill('#username', username);
+    await this.page.fill('#password', password);
+    await this.page.click('button[type="submit"]');
+  }
+
+  getErrorMessage() {
+    return this.page.locator('#flash');
+  }
+}
