@@ -1,21 +1,19 @@
-import { Page, Locator } from '@playwright/test';
+const report = require('multiple-cucumber-html-reporter');
 
-export class LoginPage {
-  constructor(private page: Page) {}
-
-  async navigate() {
-    await this.page.goto(
-      'https://the-internet.herokuapp.com/login'
-    );
+report.generate({
+  jsonDir: 'reports',
+  reportPath: 'reports/html-report',
+  metadata: {
+    browser: {
+      name: 'chrome',
+      version: 'latest'
+    },
+    device: 'Local Machine',
+    platform: {
+      name: 'windows',
+      version: '11'
+    }
   }
+});
 
-  async login(username: string, password: string) {
-    await this.page.fill('#username', username);
-    await this.page.fill('#password', password);
-    await this.page.click('button[type="submit"]');
-  }
-
-  getErrorMessage(): Locator {
-    return this.page.locator('#flash');
-  }
-}
+console.log('HTML Report Generated');
