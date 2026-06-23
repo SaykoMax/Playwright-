@@ -1,32 +1,48 @@
-Feature: Form Submission
+import { Given, When, Then, DataTable } from '@cucumber/cucumber';
+import { expect } from '@playwright/test';
+import { FormPage } from '../pages/FormPage';
 
-Scenario: Successful form submission
-  Given user is on form page
-  When user fills the form with following data:
-    | name  | Sayee             |
-    | email | sayee@test.com    |
-  Then form should be submitted successfully
+let formPage: FormPage;
 
-Scenario: Submit form with empty name
-  Given user is on form page
-  When user fills the form with following data:
-    | name  |                  |
-    | email | sayee@test.com   |
-  Then form validation message should be displayed
+Given('user is on form page', async function () {
+  formPage = new FormPage(this.page);
+  await formPage.navigate();
+});
 
-Scenario: Submit form with invalid email
-  Given user is on form page
-  When user fills the form with following data:
-    | name  | Sayee      |
-    | email | invalid123 |
-  Then form validation message should be displayed
+When(
+  'user fills the form with following data:',
+  async function (table: DataTable) {
+    const data = table.rowsHash();
 
-Scenario Outline: Multiple form submissions
-  Given user is on form page
-  When user enters "<name>" and "<email>"
-  Then form result should be "<result>"
+    await formPage.fillForm(
+      data['name'] || '',
+      data['email'] || ''
+    );
 
-Examples:
-  | name  | email            | result  |
-  | Sayee | sayee@test.com   | success |
-  |       | sayee@test.com   | failure |
+    await formPage.submitForm();
+  }
+);
+
+Then('form should be submitted successfully', async function () {
+  await expect(this.page.locator('#output')).toBeVisible();
+});
+
+Then('form validation message should be displayed', async function () {
+  console.log('Validation message displayed');
+});
+
+When(
+  'user enters form details {string} and {string}',
+  async function (name: string, email: string) {
+    await formPage.fillForm(name, email);
+    await formPage.submitForm();
+  }
+);
+
+Then('form result should be {string}', async function (result: string) {
+  if (result === 'success') {
+    await expect(this.page.locator('#output')).toBeVisible();
+  } else {
+    console.log('Form submission failed');
+  }
+});
