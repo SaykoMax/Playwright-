@@ -1,38 +1,236 @@
-You can directly paste this into your report.
+Playwright BDD Automation Framework
 
-Failure Simulation Report
+About This Project
 
-Failure Type	Failure Log / Report Snippet	Root Cause	Steps to Reproduce
+This project was created as part of a QA Automation assignment using Playwright, TypeScript, and Cucumber BDD. The main objective was to automate user workflows using industry-standard automation practices such as Page Object Model (POM), reusable components, hooks, reporting, and debugging techniques.
 
-Element Not Found	locator.fill: Timeout 30000ms exceeded waiting for locator('#wrongUserName')	The locator used in the script does not exist on the webpage. Playwright cannot find the element.	1. Open failure.spec.ts 2. Change #userName to #wrongUserName 3. Run npx playwright test failure.spec.ts 4. Observe failure.
-Incorrect Locator	locator.click: Timeout 30000ms exceeded waiting for locator('#submit123')	Incorrect locator was provided for the Submit button.	1. Change #submit to #submit123 2. Execute test 3. Playwright fails to locate button.
-Assertion Mismatch	Expected locator to be visible but it was not found	Assertion checks for a wrong element or incorrect expected result.	1. Replace #output with #wrongOutput 2. Run test 3. Assertion fails because element is not present.
-Navigation Failure	Expected URL to match /text-box/ but received https://demoqa.com/invalid-page	Test navigates to an invalid URL instead of the intended page.	1. Change URL to invalid page 2. Execute test 3. URL validation fails.
-Validation Failure	expect(locator('#output')).toBeVisible() failed	Invalid form data prevents successful submission, but test expects success.	1. Enter invalid email (invalid123) 2. Submit form 3. Verify output section 4. Assertion fails.
+The project covers automation of two modules:
 
+- Login Functionality
+- Form Submission Functionality
 
+It also includes report generation, failure simulation, and timeout handling for debugging practice.
 
 ---
 
-Timeout Simulation Report
+Technologies Used
 
-Timeout Type	Failure Log / Report Snippet	Root Cause	Steps to Reproduce
+- Playwright
+- TypeScript
+- Cucumber BDD
+- Node.js
+- Multiple Cucumber HTML Reporter
 
-Page Load Timeout	Navigation timeout of 1ms exceeded	Page could not finish loading within the specified timeout.	1. Set timeout: 1 in page.goto() 2. Run test 3. Navigation times out.
-Element Timeout	Timeout exceeded while waiting for selector '#nonExistingElement'	The specified element never appears on the page.	1. Add waitForSelector('#nonExistingElement') 2. Run test 3. Timeout occurs.
-Step Timeout	Test timeout of 5000ms exceeded	Test step execution takes longer than configured timeout.	1. Set test timeout to 5 seconds 2. Add setTimeout(10000) delay 3. Execute test.
-Locator Timeout	locator.click: Timeout exceeded waiting for locator('#missingButton')	Playwright waits for a non-existent locator until timeout is reached.	1. Use locator #missingButton 2. Attempt click action 3. Run test.
-Assertion Timeout	expect(locator).toBeVisible() timeout exceeded	Expected element never becomes visible before timeout expires.	1. Assert visibility of #missingElement 2. Run test 3. Assertion timeout occurs.
+---
 
+Project Structure
 
-Summary
+bdd-playwright/
+│
+├── features/
+│   ├── login.feature
+│   └── form.feature
+│
+├── step-definitions/
+│   ├── login.steps.ts
+│   ├── form.steps.ts
+│   └── hooks.ts
+│
+├── pages/
+│   ├── LoginPage.ts
+│   └── FormPage.ts
+│
+├── reports/
+│
+├── generate-report.js
+├── package.json
+└── tsconfig.json
 
-Total Failure Simulations: 5
+---
 
-Total Timeout Simulations: 5
+Framework Design
 
-Tools Used: Playwright + TypeScript
+The framework follows the Page Object Model design pattern.
 
-Objective: Validate framework behavior under failure conditions and understand debugging techniques.
+LoginPage
 
-Result: All failures and timeouts were successfully reproduced and documented.
+Contains all login-related locators and actions such as:
+
+- Enter username
+- Enter password
+- Click login
+- Validate login results
+
+FormPage
+
+Contains all form-related actions such as:
+
+- Enter name
+- Enter email
+- Submit form
+- Validate submission
+
+Using POM helps keep locators separate from test logic and makes maintenance easier.
+
+---
+
+Hooks Implementation
+
+Hooks are implemented using Cucumber.
+
+Before Hook
+
+Executed before every scenario.
+
+Responsibilities:
+
+- Launch browser
+- Create browser context
+- Open a new page
+
+After Hook
+
+Executed after every scenario.
+
+Responsibilities:
+
+- Close page
+- Close browser
+- Clean up resources
+
+This ensures each test runs independently.
+
+---
+
+Login Module
+
+The following scenarios were automated:
+
+1. Successful login with valid credentials
+2. Login with invalid credentials
+3. Login using multiple credential combinations
+4. Error message visibility validation
+5. Logout functionality
+6. Redirection to login page after logout
+
+Scenario Outline was used for data-driven login testing.
+
+---
+
+Form Module
+
+The following scenarios were automated:
+
+1. Successful form submission
+2. Form submission with empty name
+3. Form submission with invalid email
+4. Multiple form submissions using Scenario Outline
+
+DataTable was used to pass form input data dynamically.
+
+Example:
+
+When user fills the form with following data:
+| name  | Sayee          |
+| email | sayee@test.com |
+
+---
+
+Reporting
+
+Cucumber HTML Report
+
+After test execution:
+
+npm test
+
+Generate HTML report:
+
+node generate-report.js
+
+Report location:
+
+reports/html-report/index.html
+
+---
+
+Failure Simulation
+
+For debugging practice, different failure scenarios were created:
+
+- Element Not Found
+- Incorrect Locator
+- Assertion Mismatch
+- Navigation Failure
+- Validation Failure
+
+For each failure, root cause analysis and reproduction steps were documented.
+
+---
+
+Timeout Simulation
+
+The following timeout scenarios were explored:
+
+- Page Load Timeout
+- Element Timeout
+- Step Timeout
+
+This helped in understanding how Playwright behaves when operations exceed expected execution time.
+
+---
+
+Key Concepts Demonstrated
+
+- Page Object Model (POM)
+- Hooks (Before and After)
+- DataTable Usage
+- Scenario Outline
+- Reusable Page Classes
+- Separation of Concerns
+- HTML Reporting
+- Debugging and Failure Analysis
+
+---
+
+How to Run the Project
+
+Install dependencies:
+
+npm install
+
+Execute tests:
+
+npm test
+
+Generate report:
+
+node generate-report.js
+
+Open generated report:
+
+reports/html-report/index.html
+
+---
+
+Learning Outcomes
+
+Through this assignment, I gained hands-on experience in:
+
+- Building a BDD automation framework from scratch
+- Writing reusable Playwright automation code
+- Implementing Page Object Model
+- Working with Cucumber DataTables and Scenario Outlines
+- Generating execution reports
+- Analyzing failures and debugging test cases
+- Organizing automation projects using best practices
+
+---
+
+Author
+
+Sayee Kokate
+
+BE – Artificial Intelligence & Data Science
+
+QA Automation Assignment – Playwright + TypeScript + Cucumber BDD
