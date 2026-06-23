@@ -1,77 +1,38 @@
-import { test, expect } from '@playwright/test';
+You can directly paste this into your report.
 
-test('Element Not Found Failure', async ({ page }) => {
-  await page.goto('https://demoqa.com/text-box');
+Failure Simulation Report
 
-  // Wrong locator
-  await page.fill('#wrongUserName', 'Sayee');
-});
+Failure Type	Failure Log / Report Snippet	Root Cause	Steps to Reproduce
 
-test('Incorrect Locator Failure', async ({ page }) => {
-  await page.goto('https://demoqa.com/text-box');
-
-  await page.click('#submit123');
-});
-
-test('Assertion Mismatch Failure', async ({ page }) => {
-  await page.goto('https://demoqa.com/text-box');
-
-  await expect(page.locator('#wrongOutput')).toBeVisible();
-});
-
-test('Navigation Failure', async ({ page }) => {
-  await page.goto('https://demoqa.com/invalid-page');
-
-  await expect(page).toHaveURL(/text-box/);
-});
-
-test('Validation Failure', async ({ page }) => {
-  await page.goto('https://demoqa.com/text-box');
-
-  await page.fill('#userName', 'Sayee');
-  await page.fill('#userEmail', 'invalid123');
-
-  await page.click('#submit');
-
-  await expect(page.locator('#output')).toBeVisible();
-});
+Element Not Found	locator.fill: Timeout 30000ms exceeded waiting for locator('#wrongUserName')	The locator used in the script does not exist on the webpage. Playwright cannot find the element.	1. Open failure.spec.ts 2. Change #userName to #wrongUserName 3. Run npx playwright test failure.spec.ts 4. Observe failure.
+Incorrect Locator	locator.click: Timeout 30000ms exceeded waiting for locator('#submit123')	Incorrect locator was provided for the Submit button.	1. Change #submit to #submit123 2. Execute test 3. Playwright fails to locate button.
+Assertion Mismatch	Expected locator to be visible but it was not found	Assertion checks for a wrong element or incorrect expected result.	1. Replace #output with #wrongOutput 2. Run test 3. Assertion fails because element is not present.
+Navigation Failure	Expected URL to match /text-box/ but received https://demoqa.com/invalid-page	Test navigates to an invalid URL instead of the intended page.	1. Change URL to invalid page 2. Execute test 3. URL validation fails.
+Validation Failure	expect(locator('#output')).toBeVisible() failed	Invalid form data prevents successful submission, but test expects success.	1. Enter invalid email (invalid123) 2. Submit form 3. Verify output section 4. Assertion fails.
 
 
-import { test, expect } from '@playwright/test';
 
-test('Page Load Timeout', async ({ page }) => {
-  await page.goto(
-    'https://demoqa.com/text-box',
-    { timeout: 1 }
-  );
-});
+---
 
-test('Element Timeout', async ({ page }) => {
-  await page.goto('https://demoqa.com/text-box');
+Timeout Simulation Report
 
-  await page.waitForSelector('#nonExistingElement');
-});
+Timeout Type	Failure Log / Report Snippet	Root Cause	Steps to Reproduce
 
-test('Step Timeout', async ({ page }) => {
-  test.setTimeout(5000);
+Page Load Timeout	Navigation timeout of 1ms exceeded	Page could not finish loading within the specified timeout.	1. Set timeout: 1 in page.goto() 2. Run test 3. Navigation times out.
+Element Timeout	Timeout exceeded while waiting for selector '#nonExistingElement'	The specified element never appears on the page.	1. Add waitForSelector('#nonExistingElement') 2. Run test 3. Timeout occurs.
+Step Timeout	Test timeout of 5000ms exceeded	Test step execution takes longer than configured timeout.	1. Set test timeout to 5 seconds 2. Add setTimeout(10000) delay 3. Execute test.
+Locator Timeout	locator.click: Timeout exceeded waiting for locator('#missingButton')	Playwright waits for a non-existent locator until timeout is reached.	1. Use locator #missingButton 2. Attempt click action 3. Run test.
+Assertion Timeout	expect(locator).toBeVisible() timeout exceeded	Expected element never becomes visible before timeout expires.	1. Assert visibility of #missingElement 2. Run test 3. Assertion timeout occurs.
 
-  await page.goto('https://demoqa.com/text-box');
 
-  await new Promise(resolve =>
-    setTimeout(resolve, 10000)
-  );
-});
+Summary
 
-test('Locator Timeout', async ({ page }) => {
-  await page.goto('https://demoqa.com/text-box');
+Total Failure Simulations: 5
 
-  await page.locator('#missingButton').click();
-});
+Total Timeout Simulations: 5
 
-test('Assertion Timeout', async ({ page }) => {
-  await page.goto('https://demoqa.com/text-box');
+Tools Used: Playwright + TypeScript
 
-  await expect(page.locator('#missingElement')).toBeVisible({
-    timeout: 5000,
-  });
-});
+Objective: Validate framework behavior under failure conditions and understand debugging techniques.
+
+Result: All failures and timeouts were successfully reproduced and documented.
