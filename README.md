@@ -1,74 +1,32 @@
-import { Page } from '@playwright/test';
-
-export class FormPage {
-  constructor(private page: Page) {}
-
-  async navigate() {
-    await this.page.goto('https://demoqa.com/text-box');
-  }
-
-
 Feature: Form Submission
 
-Scenario: Submit form with multiple fields
-
+Scenario: Successful form submission
   Given user is on form page
-
   When user fills the form with following data:
-    | field | value          |
-    | name  | John           |
-    | email | john@test.com  |
-
+    | name  | Sayee             |
+    | email | sayee@test.com    |
   Then form should be submitted successfully
 
+Scenario: Submit form with empty name
+  Given user is on form page
+  When user fills the form with following data:
+    | name  |                  |
+    | email | sayee@test.com   |
+  Then form validation message should be displayed
 
+Scenario: Submit form with invalid email
+  Given user is on form page
+  When user fills the form with following data:
+    | name  | Sayee      |
+    | email | invalid123 |
+  Then form validation message should be displayed
 
-import { Given, When, Then, DataTable } from '@cucumber/cucumber';
-import { expect } from '@playwright/test';
-import { FormPage } from '../pages/FormPage';
+Scenario Outline: Multiple form submissions
+  Given user is on form page
+  When user enters "<name>" and "<email>"
+  Then form result should be "<result>"
 
-let formPage: FormPage;
-
-Given('user is on form page', async function () {
-  formPage = new FormPage(this.page);
-
-  await formPage.navigate();
-});
-
-When(
-  'user fills the form with following data:',
-  async function (table: DataTable) {
-
-    const data = table.rowsHash();
-
-    await formPage.fillForm(
-      data.name,
-      data.email
-    );
-
-    await formPage.submitForm();
-  }
-);
-
-Then('form should be submitted successfully', async function () {
-
-  await expect(
-    this.page.locator('#output')
-  ).toBeVisible();
-
-});
-
-  async fillForm(name: string, email: string) {
-    await this.page.fill('#userName', name);
-    await this.page.fill('#userEmail', email);
-  }
-
-  async submitForm() {
-    await this.page.click('#submit');
-  }
-}
-
-
-
-
-"test": "cucumber-js --require-module ts-node/register --require step-definitions/*.ts --format json:reports/cucumber-report.json"
+Examples:
+  | name  | email            | result  |
+  | Sayee | sayee@test.com   | success |
+  |       | sayee@test.com   | failure |
