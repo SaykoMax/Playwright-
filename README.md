@@ -1,236 +1,484 @@
-Playwright BDD Automation Framework
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+
+        <h1>Task Tracker</h1>
+
+        <form id="task-form">
+            <input
+                type="text"
+                id="task-title"
+                placeholder="New task..."
+                required
+            >
+            <button type="submit">Add</button>
+        </form>
+
+        <div class="filter-bar">
+            <button
+                class="filter-btn active"
+                data-filter="all"
+            >
+                All
+            </button>
+
+            <button
+                class="filter-btn"
+                data-filter="pending"
+            >
+                Pending
+            </button>
+
+            <button
+                class="filter-btn"
+                data-filter="completed"
+            >
+                Completed
+            </button>
+        </div>
+
+        <div id="task-list"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
+
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: #ececec;
+    color: #111111;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    gap: 8px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    outline: none;
+}
+
+button {
+    padding: 8px 16px;
+    background: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 12px;
+}
+
+.filter-btn {
+    background: none;
+    border: none;
+    color: #666666;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.filter-btn.active {
+    color: #000000;
+    font-weight: bold;
+}
 
-About This Project
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #e5e5e5;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.2s ease;
+}
 
-This project was created as part of a QA Automation assignment using Playwright, TypeScript, and Cucumber BDD. The main objective was to automate user workflows using industry-standard automation practices such as Page Object Model (POM), reusable components, hooks, reporting, and debugging techniques.
+.task-item:hover {
+    background-color: #f8f8f8;
+}
 
-The project covers automation of two modules:
+.task-item.dragging {
+    opacity: 0.5;
+    background-color: #dddddd;
+}
 
-- Login Functionality
-- Form Submission Functionality
+.task-item.drag-over {
+    border-top: 3px solid #000;
+}
 
-It also includes report generation, failure simulation, and timeout handling for debugging practice.
+.task-item.completed {
+    opacity: 0.5;
+}
 
----
+.task-item.completed span {
+    text-decoration: line-through;
+}
 
-Technologies Used
+.delete-btn {
+    background: none;
+    border: none;
+    color: #df2020;
+    cursor: pointer;
+    font-weight: bold;
+}
 
-- Playwright
-- TypeScript
-- Cucumber BDD
-- Node.js
-- Multiple Cucumber HTML Reporter
+.task-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
----
 
-Project Structure
 
-bdd-playwright/
-│
-├── features/
-│   ├── login.feature
-│   └── form.feature
-│
-├── step-definitions/
-│   ├── login.steps.ts
-│   ├── form.steps.ts
-│   └── hooks.ts
-│
-├── pages/
-│   ├── LoginPage.ts
-│   └── FormPage.ts
-│
-├── reports/
-│
-├── generate-report.js
-├── package.json
-└── tsconfig.json
+let tasks = JSON.parse(
+    localStorage.getItem("tasks")
+) || [];
 
----
+let filter = "all";
 
-Framework Design
+let draggedTaskId = null;
+let touchDraggedId = null;
 
-The framework follows the Page Object Model design pattern.
+const form =
+    document.getElementById("task-form");
 
-LoginPage
+const input =
+    document.getElementById("task-title");
 
-Contains all login-related locators and actions such as:
+const list =
+    document.getElementById("task-list");
 
-- Enter username
-- Enter password
-- Click login
-- Validate login results
+form.addEventListener("submit", (e) => {
 
-FormPage
+    e.preventDefault();
 
-Contains all form-related actions such as:
+    if (!input.value.trim()) return;
 
-- Enter name
-- Enter email
-- Submit form
-- Validate submission
+    tasks.push({
+        id: Date.now().toString(),
+        title: input.value.trim(),
+        completed: false
+    });
 
-Using POM helps keep locators separate from test logic and makes maintenance easier.
+    input.value = "";
 
----
+    sync();
+});
 
-Hooks Implementation
+function sync() {
 
-Hooks are implemented using Cucumber.
+    localStorage.setItem(
+        "tasks",
+        JSON.stringify(tasks)
+    );
 
-Before Hook
+    render();
+}
 
-Executed before every scenario.
+function render() {
 
-Responsibilities:
+    list.innerHTML = "";
 
-- Launch browser
-- Create browser context
-- Open a new page
+    const filteredTasks = tasks.filter(task => {
 
-After Hook
+        if (filter === "pending") {
+            return !task.completed;
+        }
 
-Executed after every scenario.
+        if (filter === "completed") {
+            return task.completed;
+        }
 
-Responsibilities:
+        return true;
+    });
 
-- Close page
-- Close browser
-- Clean up resources
+    filteredTasks.forEach(task => {
 
-This ensures each test runs independently.
+        const row =
+            document.createElement("div");
 
----
+        row.className =
+            `task-item ${task.completed ? "completed" : ""}`;
 
-Login Module
+        row.draggable = true;
 
-The following scenarios were automated:
+        row.dataset.id = task.id;
 
-1. Successful login with valid credentials
-2. Login with invalid credentials
-3. Login using multiple credential combinations
-4. Error message visibility validation
-5. Logout functionality
-6. Redirection to login page after logout
+        row.innerHTML = `
+            <div class="task-left">
+                <input
+                    type="checkbox"
+                    ${task.completed ? "checked" : ""}
+                >
+                <span>${task.title}</span>
+            </div>
 
-Scenario Outline was used for data-driven login testing.
+            <button class="delete-btn">
+                Delete
+            </button>
+        `;
 
----
+        const checkbox =
+            row.querySelector("input");
 
-Form Module
-
-The following scenarios were automated:
-
-1. Successful form submission
-2. Form submission with empty name
-3. Form submission with invalid email
-4. Multiple form submissions using Scenario Outline
-
-DataTable was used to pass form input data dynamically.
-
-Example:
-
-When user fills the form with following data:
-| name  | Sayee          |
-| email | sayee@test.com |
-
----
-
-Reporting
-
-Cucumber HTML Report
-
-After test execution:
-
-npm test
-
-Generate HTML report:
-
-node generate-report.js
-
-Report location:
-
-reports/html-report/index.html
-
----
-
-Failure Simulation
-
-For debugging practice, different failure scenarios were created:
-
-- Element Not Found
-- Incorrect Locator
-- Assertion Mismatch
-- Navigation Failure
-- Validation Failure
-
-For each failure, root cause analysis and reproduction steps were documented.
-
----
-
-Timeout Simulation
-
-The following timeout scenarios were explored:
-
-- Page Load Timeout
-- Element Timeout
-- Step Timeout
-
-This helped in understanding how Playwright behaves when operations exceed expected execution time.
-
----
-
-Key Concepts Demonstrated
-
-- Page Object Model (POM)
-- Hooks (Before and After)
-- DataTable Usage
-- Scenario Outline
-- Reusable Page Classes
-- Separation of Concerns
-- HTML Reporting
-- Debugging and Failure Analysis
-
----
-
-How to Run the Project
-
-Install dependencies:
-
-npm install
-
-Execute tests:
-
-npm test
-
-Generate report:
-
-node generate-report.js
-
-Open generated report:
-
-reports/html-report/index.html
-
----
-
-Learning Outcomes
-
-Through this assignment, I gained hands-on experience in:
-
-- Building a BDD automation framework from scratch
-- Writing reusable Playwright automation code
-- Implementing Page Object Model
-- Working with Cucumber DataTables and Scenario Outlines
-- Generating execution reports
-- Analyzing failures and debugging test cases
-- Organizing automation projects using best practices
-
----
-
-Author
-
-Sayee Kokate
-
-BE – Artificial Intelligence & Data Science
-
-QA Automation Assignment – Playwright + TypeScript + Cucumber BDD
+        checkbox.onclick = () => {
+
+            task.completed =
+                !task.completed;
+
+            sync();
+        };
+
+        const deleteBtn =
+            row.querySelector(".delete-btn");
+
+        deleteBtn.onclick = () => {
+
+            tasks = tasks.filter(
+                t => t.id !== task.id
+            );
+
+            sync();
+        };
+
+        row.addEventListener(
+            "dragstart",
+            () => {
+
+                draggedTaskId =
+                    task.id;
+
+                row.classList.add(
+                    "dragging"
+                );
+            }
+        );
+
+        row.addEventListener(
+            "dragend",
+            () => {
+
+                row.classList.remove(
+                    "dragging"
+                );
+            }
+        );
+
+        row.addEventListener(
+            "dragover",
+            (e) => {
+
+                e.preventDefault();
+
+                row.classList.add(
+                    "drag-over"
+                );
+            }
+        );
+
+        row.addEventListener(
+            "dragleave",
+            () => {
+
+                row.classList.remove(
+                    "drag-over"
+                );
+            }
+        );
+
+        row.addEventListener(
+            "drop",
+            (e) => {
+
+                e.preventDefault();
+
+                row.classList.remove(
+                    "drag-over"
+                );
+
+                if (
+                    draggedTaskId === null ||
+                    draggedTaskId === task.id
+                ) {
+                    return;
+                }
+
+                const draggedIndex =
+                    tasks.findIndex(
+                        t =>
+                            t.id ===
+                            draggedTaskId
+                    );
+
+                const targetIndex =
+                    tasks.findIndex(
+                        t =>
+                            t.id ===
+                            task.id
+                    );
+
+                const movedTask =
+                    tasks.splice(
+                        draggedIndex,
+                        1
+                    )[0];
+
+                tasks.splice(
+                    targetIndex,
+                    0,
+                    movedTask
+                );
+
+                sync();
+            }
+        );
+
+        row.addEventListener(
+            "touchstart",
+            () => {
+
+                touchDraggedId =
+                    task.id;
+            }
+        );
+
+        row.addEventListener(
+            "touchend",
+            (e) => {
+
+                const touch =
+                    e.changedTouches[0];
+
+                const target =
+                    document.elementFromPoint(
+                        touch.clientX,
+                        touch.clientY
+                    );
+
+                const targetRow =
+                    target?.closest(
+                        ".task-item"
+                    );
+
+                if (
+                    !targetRow ||
+                    !touchDraggedId
+                ) {
+                    return;
+                }
+
+                const sourceIndex =
+                    tasks.findIndex(
+                        t =>
+                            t.id ===
+                            touchDraggedId
+                    );
+
+                const targetIndex =
+                    tasks.findIndex(
+                        t =>
+                            t.id ===
+                            targetRow.dataset.id
+                    );
+
+                if (
+                    sourceIndex ===
+                    targetIndex
+                ) {
+                    return;
+                }
+
+                const movedTask =
+                    tasks.splice(
+                        sourceIndex,
+                        1
+                    )[0];
+
+                tasks.splice(
+                    targetIndex,
+                    0,
+                    movedTask
+                );
+
+                sync();
+
+                touchDraggedId =
+                    null;
+            }
+        );
+
+        list.appendChild(row);
+    });
+}
+
+document
+    .querySelectorAll(".filter-btn")
+    .forEach(btn => {
+
+        btn.onclick = (e) => {
+
+            document
+                .querySelectorAll(
+                    ".filter-btn"
+                )
+                .forEach(button => {
+
+                    button.classList.remove(
+                        "active"
+                    );
+                });
+
+            e.target.classList.add(
+                "active"
+            );
+
+            filter =
+                e.target.dataset.filter;
+
+            render();
+        };
+    });
+
+render();
