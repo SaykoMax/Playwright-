@@ -1,666 +1,160 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Task Tracker</title>
-
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<div class="app-container">
-
-    <header>
-        <h1>📋 Task Tracker</h1>
-        <p>Organize your daily tasks efficiently.</p>
-    </header>
-
-    <!-- Add Task -->
-    <form id="task-form">
-
-        <input
-            id="task-title"
-            type="text"
-            placeholder="Enter a task..."
-            maxlength="100"
-            autocomplete="off"
-        >
-
-        <button
-            id="add-btn"
-            type="submit"
-        >
-            ➕ Add Task
-        </button>
-
-    </form>
-
-    <!-- Action Buttons -->
-    <div class="action-bar">
-
-        <button
-            id="complete-all-btn"
-            class="action-btn success"
-            type="button"
-        >
-            ✓ Mark All Completed
-        </button>
-
-        <button
-            id="delete-all-btn"
-            class="action-btn danger"
-            type="button"
-        >
-            🗑 Delete All
-        </button>
-
-    </div>
-
-    <!-- Counter -->
-    <section class="task-counter">
-
-        <div class="counter-box">
-            <span>Total</span>
-            <strong id="total-count">0</strong>
-        </div>
-
-        <div class="counter-box">
-            <span>Pending</span>
-            <strong id="pending-count">0</strong>
-        </div>
-
-        <div class="counter-box">
-            <span>Completed</span>
-            <strong id="completed-count">0</strong>
-        </div>
-
-    </section>
-
-    <!-- Filters -->
-    <div class="filter-bar">
-
-        <button
-            class="filter-btn active"
-            data-filter="all"
-            type="button"
-        >
-            All
-        </button>
-
-        <button
-            class="filter-btn"
-            data-filter="pending"
-            type="button"
-        >
-            Pending
-        </button>
-
-        <button
-            class="filter-btn"
-            data-filter="completed"
-            type="button"
-        >
-            Completed
-        </button>
-
-    </div>
-
-    <!-- Empty State -->
-    <div
-        id="empty-state"
-        class="empty-state"
-    >
-
-        <div class="empty-icon">
-            📭
-        </div>
-
-        <h3>No Tasks Available</h3>
-
-        <p>
-            Add your first task to get started.
-        </p>
-
-    </div>
-
-    <!-- Task List -->
-    <div id="task-list"></div>
-
-</div>
-
-<!-- Toast -->
-<div
-    id="toast"
-    class="toast"
-></div>
-
-<script src="script.js"></script>
-
-</body>
-</html>
-
-
-
-/* ===========================
-   Global
-=========================== */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-
-body{
-    background:#eef2f7;
-    color:#222;
-    display:flex;
-    justify-content:center;
-    padding:40px 18px;
-}
-
-.app-container{
-    width:100%;
-    max-width:700px;
-    display:flex;
-    flex-direction:column;
-    gap:20px;
-}
-
-/* ===========================
-   Header
-=========================== */
-
-header{
-    text-align:center;
-}
-
-header h1{
-    font-size:34px;
-    margin-bottom:8px;
-}
-
-header p{
-    color:#666;
-    font-size:15px;
-}
-
-/* ===========================
-   Form
-=========================== */
-
-form{
-    display:flex;
-    gap:12px;
-}
-
-#task-title{
-    flex:1;
-    padding:14px;
-    border:1px solid #d8d8d8;
-    border-radius:10px;
-    outline:none;
-    font-size:15px;
-    transition:.25s;
-    background:white;
-}
-
-#task-title:focus{
-    border-color:#1976d2;
-    box-shadow:0 0 0 4px rgba(25,118,210,.12);
-}
-
-#add-btn{
-    border:none;
-    cursor:pointer;
-    color:white;
-    font-weight:600;
-    border-radius:10px;
-    padding:0 24px;
-    background:#1976d2;
-    transition:.25s;
-}
-
-#add-btn:hover{
-    background:#1565c0;
-    transform:translateY(-2px);
-    box-shadow:0 10px 20px rgba(25,118,210,.22);
-}
-
-#add-btn:active{
-    transform:scale(.95);
-}
-
-/* ===========================
-   Action Buttons
-=========================== */
-
-.action-bar{
-    display:flex;
-    gap:12px;
-}
-
-.action-btn{
-    flex:1;
-    border:none;
-    border-radius:10px;
-    padding:13px;
-    cursor:pointer;
-    color:white;
-    font-weight:600;
-    transition:.25s;
-}
-
-.action-btn:hover{
-    transform:translateY(-2px);
-}
-
-.action-btn:active{
-    transform:scale(.97);
-}
-
-.success{
-    background:#2e7d32;
-}
-
-.success:hover{
-    background:#256428;
-}
-
-.danger{
-    background:#d32f2f;
-}
-
-.danger:hover{
-    background:#b71c1c;
-}
-
-/* ===========================
-   Counter
-=========================== */
-
-.task-counter{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:14px;
-}
-
-.counter-box{
-    background:white;
-    padding:18px;
-    text-align:center;
-    border-radius:14px;
-    box-shadow:0 8px 20px rgba(0,0,0,.07);
-}
-
-.counter-box span{
-    display:block;
-    color:#666;
-    margin-bottom:6px;
-    font-size:13px;
-}
-
-.counter-box strong{
-    font-size:28px;
-}
-
-/* ===========================
-   Filters
-=========================== */
-
-.filter-bar{
-    display:flex;
-    gap:10px;
-}
-
-.filter-btn{
-    flex:1;
-    border:none;
-    background:white;
-    padding:12px;
-    cursor:pointer;
-    border-radius:30px;
-    transition:.25s;
-    font-weight:600;
-}
-
-.filter-btn:hover{
-    background:#dceeff;
-}
-
-.filter-btn.active{
-    background:#1976d2;
-    color:white;
-}
-
-/* ===========================
-   Task List
-=========================== */
-
-#task-list{
-    display:flex;
-    flex-direction:column;
-    gap:16px;
-}
-
-/* ===========================
-   Task Card
-=========================== */
-
-.task-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:18px;
-
-    background:white;
-
-    padding:18px;
-
-    border-radius:14px;
-
-    box-shadow:0 8px 18px rgba(0,0,0,.08);
-
-    transition:
-        transform .25s,
-        box-shadow .25s,
-        opacity .25s;
-
-    cursor:grab;
-
-    position:relative;
-
-    user-select:none;
-}
-
-.task-item:hover{
-    transform:translateY(-3px);
-    box-shadow:0 12px 24px rgba(0,0,0,.12);
-}
-
-.task-item:active{
-    cursor:grabbing;
-}
-
-.task-item.dragging{
-    cursor:grabbing;
-    opacity:.9;
-    transform:scale(1.03);
-    z-index:100;
-}
-
-/* ===========================
-   Left Section
-=========================== */
-
-.task-left{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    flex:1;
-}
-
-.task-left span{
-    font-size:15px;
-    line-height:1.5;
-    word-break:break-word;
-}
-
-/* ===========================
-   Completed Task
-=========================== */
-
-.task-item.completed .task-left{
-    opacity:.45;
-}
-
-.task-item.completed .task-left span{
-    text-decoration:none;
-}
-
-/* ===========================
-   Checkbox
-=========================== */
-
-input[type="checkbox"]{
-    width:18px;
-    height:18px;
-    cursor:pointer;
-    flex-shrink:0;
-}
-
-/* ===========================
-   Delete Button
-=========================== */
-
-.delete-btn{
-
-    border:none;
-
-    background:#ffebee;
-
-    color:#d32f2f;
-
-    padding:10px 16px;
-
-    border-radius:8px;
-
-    cursor:pointer;
-
-    font-weight:600;
-
-    transition:.25s;
-
-    opacity:1 !important;
-
-    flex-shrink:0;
-}
-
-.delete-btn:hover{
-    background:#ffd6d6;
-}
-/* ===========================
-   Drag & Drop
-=========================== */
-
-.drag-over{
-    outline:2px dashed #1976d2;
-    outline-offset:4px;
-}
-
-/* ===========================
-   Empty State
-=========================== */
-
-.empty-state{
-    display:none;
-    background:#fff;
-    padding:45px 25px;
-    border-radius:14px;
-    text-align:center;
-    box-shadow:0 8px 20px rgba(0,0,0,.08);
-}
-
-.empty-state.show{
-    display:block;
-}
-
-.empty-icon{
-    font-size:60px;
-    margin-bottom:14px;
-}
-
-.empty-state h3{
-    margin-bottom:8px;
-    font-size:22px;
-}
-
-.empty-state p{
-    color:#666;
-    font-size:15px;
-}
-
-/* ===========================
-   Toast
-=========================== */
-
-.toast{
-    position:fixed;
-    bottom:25px;
-    right:25px;
-
-    min-width:240px;
-    max-width:320px;
-
-    padding:14px 18px;
-
-    border-radius:10px;
-
-    background:#333;
-    color:#fff;
-
-    box-shadow:0 10px 24px rgba(0,0,0,.25);
-
-    opacity:0;
-    transform:translateY(30px);
-
-    transition:
-        opacity .35s ease,
-        transform .35s ease;
-
-    pointer-events:none;
-
-    z-index:9999;
-}
-
-.toast.show{
-    opacity:1;
-    transform:translateY(0);
-}
-
-.toast.success{
-    background:#2e7d32;
-}
-
-.toast.error{
-    background:#d32f2f;
-}
-
-.toast.info{
-    background:#1976d2;
-}
-
-/* ===========================
-   Buttons
-=========================== */
-
-button:disabled{
-    opacity:.55;
-    cursor:not-allowed;
-    transform:none !important;
-}
-
-/* ===========================
-   Animation
-=========================== */
-
-@keyframes fadeIn{
-
-    from{
-        opacity:0;
-        transform:translateY(10px);
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-
-}
-
-.task-item{
-    animation:fadeIn .25s ease;
-}
-
-/* ===========================
-   Scrollbar
-=========================== */
-
-::-webkit-scrollbar{
-    width:8px;
-}
-
-::-webkit-scrollbar-track{
-    background:#f2f2f2;
-}
-
-::-webkit-scrollbar-thumb{
-    background:#c7c7c7;
-    border-radius:20px;
-}
-
-::-webkit-scrollbar-thumb:hover{
-    background:#a9a9a9;
-}
-
-/* ===========================
-   Mobile
-=========================== */
-
-@media (max-width:650px){
-
-    body{
-        padding:20px 14px;
-    }
-
-    form{
-        flex-direction:column;
-    }
-
-    #add-btn{
-        width:100%;
-        padding:14px;
-    }
-
-    .action-bar{
-        flex-direction:column;
-    }
-
-    .task-counter{
-        grid-template-columns:1fr;
-    }
-
-    .filter-bar{
-        flex-wrap:wrap;
-    }
-
-    .filter-btn{
-        min-width:95px;
-    }
-
-    .task-item{
-        flex-direction:column;
-        align-items:flex-start;
-    }
-
-    .task-left{
-        width:100%;
-    }
-
-    .delete-btn{
-        align-self:flex-end;
-    }
-
-    .toast{
-        left:15px;
-        right:15px;
+BUG-029: Website redirects to Home page after browser refresh
+
+Overview
+
+Refreshing the browser on any page redirects the user to the Home page instead of retaining the current page.
+
+Module
+
+Navigation
+
+Preconditions
+
+ShopEasy application is open.
+
+User has navigated to any page other than the Home page (e.g., Products, Cart, Wishlist, About).
+
+
+Steps to Reproduce
+
+1. Open the ShopEasy application.
+
+
+2. Navigate to the Products, Cart, or Wishlist page.
+
+
+3. Press F5 or click the browser's Refresh button.
+
+
+
+Expected Result
+
+The application should remain on the current page after refreshing.
+
+Actual Result
+
+The application always redirects the user to the Home page after refresh.
+
+
+---
+
+BUG-030: Wishlist items do not provide an "Add to Cart" option
+
+Overview
+
+Products added to the Wishlist cannot be directly added to the Cart because the Wishlist page does not provide an Add to Cart button.
+
+Module
+
+Wishlist
+
+Preconditions
+
+User has added at least one product to the Wishlist.
+
+
+Steps to Reproduce
+
+1. Open the ShopEasy application.
+
+
+2. Add a product to the Wishlist.
+
+
+3. Navigate to the Wishlist page.
+
+
+4. Observe the available actions for the product.
+
+
+
+Expected Result
+
+Each wishlist item should have an Add to Cart option so users can easily move products to the shopping cart.
+
+Actual Result
+
+No Add to Cart option is available for wishlist items.
+
+
+---
+
+BUG-031: Product offers or discounts are not displayed
+
+Overview
+
+The application does not display any offers, discounts, or promotional information on product listings.
+
+Module
+
+Products
+
+Preconditions
+
+ShopEasy application is open.
+
+User is on the Products page.
+
+
+Steps to Reproduce
+
+1. Open the ShopEasy application.
+
+
+2. Navigate to the Products page.
+
+
+3. Browse through the available products.
+
+
+
+Expected Result
+
+Products with applicable offers or discounts should display promotional information such as discount percentage, sale price, or offer badge.
+
+Actual Result
+
+No offers or discount information are displayed for any products.
+
+
+---
+
+BUG-032: Product filtering options are not functional
+
+Overview
+
+The application does not allow users to filter products based on Fashion Category, Size, Gender, Brand, or Color.
+
+Module
+
+Products / Filters
+
+Preconditions
+
+ShopEasy application is open.
+
+User is on the Products page.
+
+
+Steps to Reproduce
+
+1. Open the ShopEasy application.
+
+
+2. Navigate to the Products page.
+
+
+3. Attempt to filter products by Fashion Category, Size, Gender, Brand, or Color.
+
+
+
+Expected Result
+
+Products should be filtered based on the selected criteria.
+
+Actual Result
+
+No filtering options are available, or selecting filter criteria does not affect the displayed products.ght:15px;
         bottom:18px;
         max-width:none;
         min-width:auto;
