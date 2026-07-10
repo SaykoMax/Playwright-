@@ -1,7 +1,5 @@
- http from 'k6/http';
+import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js';
 
 // --- Test configuration ---
 export const options = {
@@ -18,9 +16,6 @@ export const options = {
 
 const BASE_URL = 'https://quickpizza.grafana.com';
 
-// Set these to a valid QuickPizza account.
-// If you don't have one yet, register once via:
-//   POST {BASE_URL}/api/users  { "username": "...", "password": "..." }
 const USERNAME = __ENV.QP_USERNAME || 'default';
 const PASSWORD = __ENV.QP_PASSWORD || '12345678';
 
@@ -50,10 +45,9 @@ export default function () {
   sleep(1);
 }
 
-// --- Bonus: generate an HTML summary report ---
-export function handleSummary(data) {
-  return {
-    'summary.html': htmlReport(data),
-    stdout: textSummary(data, { indent: ' ', enableColors: true }),
-  };
-}
+// No external HTML reporter needed — k6 always writes a text summary to
+// stdout automatically. To save it to a file instead of just printing it,
+// run k6 like this:
+//   k6 run login-load-test-no-bonus.js > results.txt
+// Or get raw JSON metrics for your own report:
+//   k6 run --out json=results.json login-load-test-no-bonus.js
