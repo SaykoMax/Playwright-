@@ -3,35 +3,20 @@ import { check } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '10s', target: 20 }, // Ramp up
-    { duration: '30s', target: 20 }, // Constant load
-    { duration: '20s', target: 0 },  // Ramp down
+    { duration: '10s', target: 20 }, // Ramp-up
+    { duration: '30s', target: 20 }, // Maintain load
+    { duration: '20s', target: 0 },  // Ramp-down
   ],
 };
 
-export default function () {
+const BASE_URL = 'https://quickpizza.grafana.com';
 
-  // Step 1: Get application page to create a session
-  const home = http.get('https://quickpizza.grafana.com/');
-
-  // Step 2: Read CSRF cookie
-  const jar = http.cookieJar();
-  const cookies = jar.cookiesForURL('https://quickpizza.grafana.com/');
-
-  if (!cookies.csrf_token) {
-    console.log("CSRF token not received.");
-    return;
-  }
-
-  const csrf = cookies.csrf_token[0];
-
-  // Step 3: Login request
-  const url = 'https://quickpizza.grafana.com/api/users/token/login?set_cookie=true';
+export default function (): void {
 
   const payload = JSON.stringify({
     username: 'default',
     password: '12345678',
-    csrf: csrf
+    csrf: 'RYSU4jq3Syf0yHsTjvH6y5woFXvQhRUS' // Replace with a fresh CSRF token if required
   });
 
   const params = {
@@ -40,13 +25,17 @@ export default function () {
     },
   };
 
-  const res = http.post(url, payload, params);
+  const response = http.post(
+    `${BASE_URL}/api/users/token/login?set_cookie=true`,
+    payload,
+    params
+  );
 
-  console.log("Status:", res.status);
-  console.log("Response:", res.body);
-
-  check(res, {
-    'Status is 200': (r) => r.status === 200,
-    'Token received': (r) => r.body.includes('token'),
+  check(response, {
+    'Status code is 200': (r) => r.status === 200,
+    'Login successful': (r) => r.body.includes('token'),
   });
+
+  console.log(`Status: ${response.status}`);
+  console.log(`Response: ${response.body}`);
 }
