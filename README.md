@@ -1,98 +1,64 @@
-Based on the bugs you actually found during testing, here they are in a professional defect report format.
+import http from 'k6/http';
+import { check } from 'k6';
 
+export const options = {
+  stages: [
+    { duration: '10s', target: 20 },
+    { duration: '30s', target: 20 },
+    { duration: '20s', target: 0 },
+  ],
+};
 
----
+export default function () {
+  const url = 'https://quickpizza.grafana.com/api/users/token/login?set_cookie=true';
 
-BUG-001: Clear button is disabled when the "Your Colors" table is empty
+  const payload = JSON.stringify({
+    username: 'default',
+    password: '12345678',
+    csrf: 'RYSU4jq3Syf0yHsTjvH6y5woFXvQhRUS'
+  });
 
-Subject: Clear button cannot be clicked when the "Your Colors" table is empty.
+  const params = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
 
-Steps to Reproduce:
+  const res = http.post(url, payload, params);
 
-1. Launch the Paint Mixer application.
-
-
-2. Ensure no color mixes have been created.
-
-
-3. Observe the Clear button.
-
-
-
-Expected Output: The Clear button should either remain enabled and perform no action or provide appropriate feedback to the user.
-
-Actual Output: The Clear button is disabled and cannot be clicked when the table is empty.
-
-
----
-
-BUG-002: Mix button cannot be used again for the same color ratio
-
-Subject: Mix button becomes unavailable for the same Blue and Green ratio.
-
-Steps to Reproduce:
-
-1. Set Blue = 2 and Green = 3.
-
-
-2. Click the Mix button.
-
-
-3. Without changing the values, click the Mix button again.
+  check(res, {
+    'Status is 200': (r) => r.status === 200,
+    'Login successful': (r) => r.status === 200,
+  });
+}
 
 
 
-Expected Output: The application should allow creating the same mix again or display an appropriate validation message explaining why it is not allowed.
+For Exercise 1: Identify the Test Type, the correct answers are:
 
-Actual Output: The Mix button cannot be used again for the same color ratio without any explanation.
+Scenario	Test Type	Reason
 
-
----
-
-BUG-003: Sort functionality does not indicate sorting order
-
-Subject: Sort feature does not specify whether records are sorted in ascending or descending order.
-
-Steps to Reproduce:
-
-1. Create multiple paint mixes with different Blue and Green ratios.
+5,000 students start a quiz at exactly 9:00 AM	Load Testing	Verifies system performance under the expected peak number of concurrent users.
+LMS is pushed to 20,000 users to determine the system breaking point	Stress Testing	Increases the load beyond normal capacity to identify when the system fails.
+Quiz platform is run continuously for 24 hours	Soak (Endurance) Testing	Checks system stability, memory leaks, and performance over a long duration.
+The tester gradually increases virtual users until the application becomes unresponsive and starts returning errors	Stress Testing	Continues increasing the load until the application reaches its breaking point.
+The course enrollment system is run with 2,500 concurrent users continuously for 24 hours	Soak (Endurance) Testing	Tests how the application performs under a sustained normal load for an extended period.
 
 
-2. Click the Sort button.
+Final Answers
+
+1. Load Testing
 
 
-3. Observe the order of the records.
+2. Stress Testing
 
 
-
-Expected Output: The application should indicate the sorting order (Ascending/Descending) or provide an option to choose the sorting direction.
-
-Actual Output: Records are sorted, but the sorting order is not specified, causing ambiguity for the user.
+3. Soak (Endurance) Testing
 
 
----
-
-BUG-004: Mixed color entries do not display a shade/color label
-
-Subject: No label is displayed for the generated shade of color.
-
-Steps to Reproduce:
-
-1. Select valid Blue and Green quantities.
+4. Stress Testing
 
 
-2. Click the Mix button.
+5. Soak (Endurance) Testing 
 
 
-3. Observe the generated entry in the Your Colors table.
-
-
-
-Expected Output: The generated color should display an appropriate shade/color name or label in the Color column.
-
-Actual Output: The generated shade is displayed without any descriptive color label.
-
-
----
-
-These are based on your observations and are appropriate for a QA training submission. If your mentor expects Redmine-style reports, you can also add Severity (Low/Medium/High), Priority, and Status columns.
