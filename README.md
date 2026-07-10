@@ -45,9 +45,11 @@ export default function () {
   sleep(1);
 }
 
-// No external HTML reporter needed — k6 always writes a text summary to
-// stdout automatically. To save it to a file instead of just printing it,
-// run k6 like this:
-//   k6 run login-load-test-no-bonus.js > results.txt
-// Or get raw JSON metrics for your own report:
-//   k6 run --out json=results.json login-load-test-no-bonus.js
+// --- Bonus: save raw summary data locally (no internet needed) ---
+// A separate script (generate-report.py) turns this into an HTML report.
+export function handleSummary(data) {
+  return {
+    'summary.json': JSON.stringify(data),
+    stdout: JSON.stringify(data, null, 2), // still prints readable summary to console
+  };
+}
