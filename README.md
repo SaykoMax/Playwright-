@@ -3,19 +3,35 @@ import { check } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '10s', target: 20 },
-    { duration: '30s', target: 20 },
-    { duration: '20s', target: 0 },
+    { duration: '10s', target: 20 }, // Ramp up
+    { duration: '30s', target: 20 }, // Constant load
+    { duration: '20s', target: 0 },  // Ramp down
   ],
 };
 
 export default function () {
+
+  // Step 1: Get application page to create a session
+  const home = http.get('https://quickpizza.grafana.com/');
+
+  // Step 2: Read CSRF cookie
+  const jar = http.cookieJar();
+  const cookies = jar.cookiesForURL('https://quickpizza.grafana.com/');
+
+  if (!cookies.csrf_token) {
+    console.log("CSRF token not received.");
+    return;
+  }
+
+  const csrf = cookies.csrf_token[0];
+
+  // Step 3: Login request
   const url = 'https://quickpizza.grafana.com/api/users/token/login?set_cookie=true';
 
   const payload = JSON.stringify({
     username: 'default',
     password: '12345678',
-    csrf: 'RYSU4jq3Syf0yHsTjvH6y5woFXvQhRUS'
+    csrf: csrf
   });
 
   const params = {
@@ -26,39 +42,11 @@ export default function () {
 
   const res = http.post(url, payload, params);
 
+  console.log("Status:", res.status);
+  console.log("Response:", res.body);
+
   check(res, {
     'Status is 200': (r) => r.status === 200,
-    'Login successful': (r) => r.status === 200,
+    'Token received': (r) => r.body.includes('token'),
   });
 }
-
-
-
-For Exercise 1: Identify the Test Type, the correct answers are:
-
-Scenario	Test Type	Reason
-
-5,000 students start a quiz at exactly 9:00 AM	Load Testing	Verifies system performance under the expected peak number of concurrent users.
-LMS is pushed to 20,000 users to determine the system breaking point	Stress Testing	Increases the load beyond normal capacity to identify when the system fails.
-Quiz platform is run continuously for 24 hours	Soak (Endurance) Testing	Checks system stability, memory leaks, and performance over a long duration.
-The tester gradually increases virtual users until the application becomes unresponsive and starts returning errors	Stress Testing	Continues increasing the load until the application reaches its breaking point.
-The course enrollment system is run with 2,500 concurrent users continuously for 24 hours	Soak (Endurance) Testing	Tests how the application performs under a sustained normal load for an extended period.
-
-
-Final Answers
-
-1. Load Testing
-
-
-2. Stress Testing
-
-
-3. Soak (Endurance) Testing
-
-
-4. Stress Testing
-
-
-5. Soak (Endurance) Testing 
-
-
