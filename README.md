@@ -1,11 +1,21 @@
-Use the following Excel report format for WCAG 2.1.1 – Keyboard.
+Based on the screenshot, WAVE reports "Missing form label" for a form control on the New Password / Reset Password page. This maps to WCAG 1.3.1 – Info and Relationships (Level A) and WCAG 3.3.2 – Labels or Instructions (Level A).
+
+Use this Excel report format:
 
 Field	Details
 
-Page	Sign In
-Success Criteria	2.1.1 – Keyboard
+Page	New Password / Reset Password
+Success Criteria	3.3.2 – Labels or Instructions
 Conformance Level	A
-Issue Summary	The Remember me checkbox and Sign in button are not keyboard accessible using the Tab key.
-Issue & Users Impacted	When navigating the Sign In page using the Tab key, keyboard focus skips the Remember me checkbox and Sign in button, preventing users from accessing these controls without a mouse. As a result, keyboard-only users and screen reader users cannot interact with the checkbox or submit the sign-in form, making the authentication process inaccessible.
-Source Code Example	html<br><input type="checkbox" id="remember-me" tabindex="-1"><br><button tabindex="-1">Sign in</button><br><br>or any implementation where these controls are removed from the keyboard tab order.
-Recommendation to Fix	Ensure the Remember me checkbox and Sign in button are keyboard accessible and included in the natural tab order. Remove any tabindex="-1" or other code that prevents these controls from receiving keyboard focus. Verify that users can navigate to and activate all interactive elements using only the keyboard (Tab, Shift+Tab, Enter, and Space).
+Issue Summary	A form control on the New Password page does not have an associated accessible label.
+Issue & Users Impacted	One of the form controls on the New Password page does not have a programmatically associated label. As a result, screen readers may announce the control without describing its purpose, making it difficult for users with visual impairments to understand what information is required. Keyboard and assistive technology users may be unable to complete the form accurately.
+Source Code Example	html<br><input type="password" id="newPassword"><br><!-- Missing associated <label> or aria-label -->
+Recommendation to Fix	Associate every form control with a visible <label> using the for attribute or provide an accessible name using aria-label or aria-labelledby. For example:<br><br>html<br><label for="newPassword">New Password</label><br><input type="password" id="newPassword">
+
+
+You can also report:
+
+Success Criteria: 1.3.1 – Info and Relationships (Level A)
+
+
+This criterion applies because the relationship between the form control and its label is not programmatically exposed to assistive technologies. If you're reporting only one criterion, 3.3.2 – Labels or Instructions is the most direct fit for this issue.
