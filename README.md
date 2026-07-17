@@ -1,11 +1,18 @@
-Yes. Following the same format, here's the report for WCAG 2.4.3 – Focus Order.
+If the star icons are intentionally decorative (aria-hidden="true") and NVDA announces "4.5" (and ideally the review count), then that alone is not an accessibility issue. Decorative stars are correctly hidden from assistive technologies.
+
+However, if NVDA only announces "4.5" and does not convey that it is a rating, then users may not understand what the number represents. That becomes a Name, Role, Value issue.
+
+You can report it as follows:
 
 Field	Details
 
-Page	Sign In
-Success Criteria	2.4.3 – Focus Order
+Page	Book Details
+Success Criteria	4.1.2 – Name, Role, Value
 Conformance Level	A
-Issue Summary	Keyboard focus does not follow a logical sequence when navigating through the Sign In page using the Tab key.
-Issue & Users Impacted	While navigating the Sign In page using the keyboard, the focus order does not match the visual and logical reading order. The focus moves unpredictably between the Email field, Password field, header controls, and other interactive elements, making it difficult for keyboard-only users and screen reader users to understand their current position on the page and complete the sign-in process efficiently. An illogical focus order increases cognitive load and may cause users to miss important form fields or controls.
-Source Code Example	html<br><input type="email" ...><br><input type="password" ...><br><!-- Verify tabindex values or DOM order if present --><br><!-- Example of incorrect usage: --><br><input type="password" tabindex="1"><br><input type="email" tabindex="2">
-Recommendation to Fix	Ensure that all interactive elements receive keyboard focus in a logical sequence that matches the visual layout and reading order. Avoid using positive tabindex values unless absolutely necessary. Arrange elements in the DOM so the natural Tab order is: Email → Password → Remember Me → Forgot Password → Sign In → Create an Account. Verify the corrected focus order using keyboard-only navigation and a screen reader such as NVDA.
+Issue Summary	Rating information is not announced with sufficient context to screen reader users.
+Issue & Users Impacted	The visual star icons are hidden from assistive technologies using aria-hidden="true", which is appropriate for decorative content. However, NVDA announces only "4.5" without identifying it as the book's rating (e.g., "Rating 4.5 out of 5"). Screen reader users may not understand what the numeric value represents, reducing the clarity of the information.
+Source Code Example	html<br><span aria-hidden="true">★★★★★</span><br><span>4.5</span><br><span>(845 reviews)</span>
+Recommendation to Fix	Provide an accessible name for the rating, such as "Rating: 4.5 out of 5 stars, based on 845 reviews." This can be achieved using aria-label, visually hidden text, or by ensuring the text exposed to assistive technologies includes the context. Example:<br><br>html<br><div aria-label="Rating 4.5 out of 5 stars, based on 845 reviews">★★★★★ <span aria-hidden="true">4.5</span></div>
+
+
+Important: If NVDA actually announces "4.5 out of 5, 845 reviews" or "Rating 4.5 out of 5", then this passes WCAG and should not be reported. The issue only exists if NVDA truly announces just "4.5" with no context.
