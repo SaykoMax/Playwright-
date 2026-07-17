@@ -1,13 +1,11 @@
-If you've confirmed that no aria-live, role="status", role="alert", or other live region exists, then this is a valid WCAG 2.2 – 4.1.3 Status Messages (Level AA) issue.
-
-Use the following report in your Excel:
+Yes. Following the same format, here's the report for WCAG 2.4.3 – Focus Order.
 
 Field	Details
 
-Page	Shop
-Success Criteria	4.1.3 – Status Messages
-Conformance Level	AA
-Issue Summary	Dynamic search result updates are not announced to assistive technologies.
-Issue & Users Impacted	When users type in the search field, the product list updates dynamically. If no matching books are found, the message "No books match your filters." is displayed visually. However, because the message is not contained within an aria-live region or a role="status" element, screen reader users are not notified that the search results have changed. As a result, users who rely on assistive technologies may assume the page has not updated and may not realize that no matching results are available, causing confusion and reducing usability.
-Source Code Example	html<br><p class="text-sm text-muted-foreground">No books match your filters.</p>
-Recommendation to Fix	Wrap the dynamically updated search result message in an aria-live="polite" region or a container with role="status" so that assistive technologies automatically announce changes. For example:<br><br>html<br><div role="status" aria-live="polite">No books match your filters.</div><br><br>Alternatively, update an existing live region with messages such as "5 books found" or "No books match your filters." whenever the search results change, ensuring screen reader users receive the same feedback as sighted users.
+Page	Sign In
+Success Criteria	2.4.3 – Focus Order
+Conformance Level	A
+Issue Summary	Keyboard focus does not follow a logical sequence when navigating through the Sign In page using the Tab key.
+Issue & Users Impacted	While navigating the Sign In page using the keyboard, the focus order does not match the visual and logical reading order. The focus moves unpredictably between the Email field, Password field, header controls, and other interactive elements, making it difficult for keyboard-only users and screen reader users to understand their current position on the page and complete the sign-in process efficiently. An illogical focus order increases cognitive load and may cause users to miss important form fields or controls.
+Source Code Example	html<br><input type="email" ...><br><input type="password" ...><br><!-- Verify tabindex values or DOM order if present --><br><!-- Example of incorrect usage: --><br><input type="password" tabindex="1"><br><input type="email" tabindex="2">
+Recommendation to Fix	Ensure that all interactive elements receive keyboard focus in a logical sequence that matches the visual layout and reading order. Avoid using positive tabindex values unless absolutely necessary. Arrange elements in the DOM so the natural Tab order is: Email → Password → Remember Me → Forgot Password → Sign In → Create an Account. Verify the corrected focus order using keyboard-only navigation and a screen reader such as NVDA.
