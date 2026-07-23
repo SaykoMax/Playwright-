@@ -1,96 +1,191 @@
-Based on your screenshots and description:
+Yes, this is a valid accessibility issue.
 
-Clicking Sign In logs the user in successfully.
+From your screenshots:
 
-There is no success message such as "Signed in successfully" or "Welcome back."
+The page displays "Enter the 6-digit code we sent to sc@fc.com" after the email is submitted.
 
-NVDA does not announce that the login was successful.
+NVDA does not announce this updated instruction when the page changes.
 
-The code shows only a clickable <div> with no live region for announcing the status.
+This means the newly displayed status/instruction is not being exposed to assistive technologies.
 
 
-This is a valid WCAG 4.1.3 – Status Messages (Level AA) issue.
+Success Criterion
 
-Use the following format in your Excel:
+WCAG 4.1.3 – Status Messages (Level AA)
 
 Field	Details
 
-Page	Login
-Success Criteria	4.1.3 – Status Messages
-Conformance Level	Level AA
-Issue Summary	Successful sign-in is not announced to assistive technologies.
-Issue & Users Impacted	After selecting the Sign In button with valid credentials, the application logs the user in but does not provide any accessible status message confirming that the login was successful. Screen reader users receive no audible confirmation that authentication has completed successfully and may be uncertain whether the action was processed or if they should attempt to sign in again. This creates an inconsistent experience compared to sighted users, who can visually recognize that the page has changed after login.
-Source Code Example	html<br><div class="cursor-pointer rounded-md bg-primary px-4 py-2.5 text-center">Sign In</div><br><!-- No aria-live region announcing successful login -->
-Recommendation to Fix	After successful authentication, provide an accessible status message using an ARIA live region. The application should announce messages such as "Signed in successfully.", "Welcome back.", or "Login successful. Redirecting to home page." without moving keyboard focus.
-Sample Fix Code	html<br><button id="signin">Sign In</button><br><div id="login-status" role="status" aria-live="polite" aria-atomic="true"></div><br><script><br>function loginSuccess() {<br>  document.getElementById('login-status').textContent = 'Signed in successfully. Redirecting to home page.';<br>}<br></script>
+Success Criterion	4.1.3 – Status Messages (Level AA)
+Issue Summary	OTP instruction message is not announced by screen readers after the Send Code action.
+Issue & User Impact	After activating Send Code, the page updates to display "Enter the 6-digit code we sent to sc@fc.com". This change is visible but is not announced by screen readers. Users relying on assistive technologies may not realize that the verification step has started or know which email address received the code, making the authentication process difficult to complete.
+Recommendation	Ensure the OTP instruction is announced automatically using an ARIA live region or move keyboard focus to the newly displayed content.
+Sample Fix Code	```html
 
 
-Before reporting this issue
+<div id="otp-message" role="status" aria-live="polite">
+  Enter the 6-digit code we sent to sc@fc.com
+</div>
+``` |Alternative (if immediate announcement is required):
 
-Verify that:
+<div id="otp-message" role="alert">
+  Enter the 6-digit code we sent to sc@fc.com
+</div>
 
-Login succeeds.
+Why this is happening
 
-NVDA does not announce any success message.
+From the code you shared, the page contains only regular <div> and <p> elements for the updated content. They are not inside an aria-live region and focus is not moved to the new content, so NVDA has no reason to announce it automatically.
 
-There is no role="status", aria-live, or role="alert" used to communicate successful login.
-
-
-If these conditions are true, reporting it under WCAG 4.1.3 – Status Messages is appropriate.
-
-
-
-
-From the code in your screenshot, the problem is clear.
-
-The label is not implemented as an actual HTML <label> element. Instead, it is just:
-
-<div class="text-sm mb-2">Email address</div>
-
-<input type="email" class="w-full rounded-md ..." />
-
-A <div> does not automatically label an input. Therefore, NVDA announces only "edit blank" instead of "Email address, edit".
-
-Applicable WCAG
-
-1.3.1 – Info and Relationships (Level A) ✅
-
-4.1.2 – Name, Role, Value (Level A) ✅ (because the input has no accessible name)
+This is best reported as a WCAG 4.1.3 – Status Messages failure.
 
 
-Issue
 
-Email input field does not have a programmatically associated label.
 
-User Impact
+If the Orders page content is loaded dynamically and NVDA does not announce that the page has changed (e.g., it doesn't read "Your orders" or indicate that the orders have loaded), you can report it under WCAG 4.1.3 – Status Messages (Level AA).
 
-Screen reader users hear only "edit blank" instead of "Email address, edit". They cannot determine what information should be entered, making the form difficult to complete independently.
+Field	Details
 
-Recommendation
+Success Criterion	WCAG 4.1.3 – Status Messages (Level AA)
+Issue Summary	Orders page content is not announced to screen reader users after navigation.
+Issue & User Impact	After navigating to the Orders page, the application dynamically updates the displayed content, but no status message is announced to screen readers. Users relying on assistive technologies are not informed that the Orders page has loaded and may not realize new content is available, causing confusion and reducing usability.
+Recommendation	Announce the page update using an ARIA live region or move focus to the page heading (<h1>) so the new content is automatically announced by screen readers.
+Sample Fix Code	```html
 
-Associate the visible label with the input using a <label> element and matching for/id attributes, or provide an accessible name using aria-labelledby or aria-label.
 
-Current Code
+<h1 id="orders-heading" tabindex="-1">Your orders</h1><div role="status" aria-live="polite">
+  Orders page loaded. 1 order found.
+</div><script>
+document.getElementById('orders-heading').focus();
+</script>This format is suitable if your application is an SPA (React, Angular, Vue, etc.) where the page changes without a full page reload and NVDA does not announce the updated content.
 
-<div class="text-sm mb-2">Email address</div>
-<input type="email">
 
-Recommended Fix
 
-<label for="email" class="text-sm mb-2">
-  Email address
-</label>
 
-<input
-  id="email"
-  type="email"
-  name="email"
-  autocomplete="email">
+This is also a WCAG 4.1.3 – Status Messages (Level AA) issue because the cart count changes dynamically (e.g., from 4 to 5 items) but the change is not announced to screen reader users.
 
-Alternative fix (if a visible <label> cannot be used):
+Field	Details
 
-<input
-  type="email"
-  aria-label="Email address">
+Success Criterion	WCAG 4.1.3 – Status Messages (Level AA)
+Issue Summary	Updated cart item count is not announced to screen reader users after adding a product to the cart.
+Issue & User Impact	When a user activates the Add to cart button on the Product Details page, a visual toast message ("Northern Lights Atlas added to cart") appears and the cart badge updates from 4 to 5 items. However, the updated cart count is not announced by screen readers. Users relying on assistive technologies may not know that the cart quantity has changed, reducing confidence that the action was completed successfully.
+Recommendation	Use an ARIA live region (role="status" or aria-live="polite") to announce the updated cart count whenever the badge value changes. The announcement should include both the product addition and the new total number of items in the cart.
+Sample Fix Code	```html
 
-Since your NVDA Speech Viewer says only "edit blank", this is a valid accessibility defect under WCAG 1.3.1 and WCAG 4.1.2.
+
+<!-- Hidden live region --><div id="cart-status"
+     role="status"
+     aria-live="polite"
+     aria-atomic="true"
+     class="sr-only">
+</div><!-- Cart badge --><a href="/cart" aria-label="Cart, 5 items">
+  <span id="cart-count">5</span>
+</a><script>
+function updateCart(productName, count) {
+  document.getElementById("cart-count").textContent = count;
+  document.querySelector('a[href="/cart"]')
+    .setAttribute("aria-label", `Cart, ${count} items`);
+
+  document.getElementById("cart-status").textContent =
+    `${productName} added to cart. Cart now contains ${count} items.`;
+}
+</script>**Expected NVDA announcement:**
+> "Northern Lights Atlas added to cart. Cart now contains 5 items."
+
+This ensures screen reader users receive the same feedback that sighted users get from the visual cart badge update.
+
+
+
+
+This is a semantic structure issue and should be reported under WCAG 1.3.1 – Info and Relationships (Level A) because tabular data is created using generic <div> elements instead of semantic table markup.
+
+Field	Details
+
+Success Criterion	WCAG 1.3.1 – Info and Relationships (Level A)
+Issue Summary	Orders data is visually presented as a table but is built using <div> elements instead of semantic table markup.
+Issue & User Impact	The Orders page displays structured tabular information such as Order ID, Placed On, Items, Total, Product Details, Payment, and Shipping. However, the content is constructed using generic <div> elements rather than semantic <table>, <thead>, <tbody>, <tr>, <th>, and <td> elements. As a result, screen readers cannot identify row and column relationships, announce column headers, or allow users to efficiently navigate the data using table navigation commands. This makes the order details difficult to understand for users of assistive technologies.
+Recommendation	Use semantic HTML table elements for tabular data. Define column headers using <th> elements with the appropriate scope attribute and place data within <td> cells. This enables assistive technologies to correctly interpret and announce the table structure.
+Sample Fix Code	```html
+
+
+<table>
+  <thead>
+    <tr>
+      <th scope="col">Order</th>
+      <th scope="col">Placed On</th>
+      <th scope="col">Items</th>
+      <th scope="col">Total</th>
+    </tr>
+  </thead>  <tbody>
+    <tr>
+      <td>#BG-24037</td>
+      <td>Jul 16, 2026, 05:49 PM</td>
+      <td>2</td>
+      <td>$47.98</td>
+    </tr><tr>
+  <td>Northern Lights Atlas</td>
+  <td>Henrik Sól</td>
+  <td>Qty: 1</td>
+  <td>$34.00</td>
+</tr>
+
+  </tbody>
+</table>
+``` |Expected Behavior:
+
+Screen readers announce "Table with X rows and Y columns."
+
+Users can navigate by rows and columns using screen reader table commands.
+
+Column headers (Order, Placed On, Items, Total) are announced along with each corresponding cell, providing the correct context for the order information.
+
+
+
+
+This should be reported under WCAG 4.1.2 – Name, Role, Value (Level A) because the custom checkbox is built with a <div> instead of a native checkbox, making it inaccessible to keyboard and assistive technology users.
+
+Field	Details
+
+Success Criterion	WCAG 4.1.2 – Name, Role, Value (Level A)
+Issue Summary	"Remember me" checkbox is implemented using a <div> instead of a native checkbox, making it inaccessible.
+Issue & User Impact	The Remember me option is created using a generic <div> element rather than a native <input type="checkbox">. As a result, the control is not keyboard accessible, cannot receive focus, does not respond to the Spacebar key, and its checked/unchecked state is not conveyed to assistive technologies. Screen reader and keyboard-only users may be unable to interact with or determine the state of the checkbox.
+Recommendation	Use a native <input type="checkbox"> with an associated <label>. If a custom checkbox is required, implement role="checkbox", tabindex="0", aria-checked, and support keyboard interaction using the Spacebar. Native HTML controls are strongly recommended.
+Sample Fix Code	```html
+<label for="remember-me">	
+<input	
+
+
+type="checkbox"
+id="remember-me"
+name="remember-me">
+
+Remember me </label>
+
+**If a custom control is unavoidable:**
+```html
+<div
+  role="checkbox"
+  tabindex="0"
+  aria-checked="false"
+  id="rememberMe">
+  Remember me
+</div>
+
+<script>
+const checkbox = document.getElementById("rememberMe");
+
+checkbox.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    const checked =
+      checkbox.getAttribute("aria-checked") === "true";
+    checkbox.setAttribute("aria-checked", !checked);
+  }
+});
+</script>
+``` |
+
+**Expected Behavior:**
+- The **Remember me** checkbox receives keyboard focus.
+- Pressing the **Spacebar** toggles the checkbox state.
+- Screen readers announce the control as **"Remember me, checkbox, checked/not checked."**
+
+
